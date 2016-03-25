@@ -1,0 +1,116 @@
+---
+title: "ConfusionMatrix"
+author: "Win-Vector LLC"
+date: "March 14, 2016"
+output: html_document
+---
+
+Confusion Matrix derived statistics.
+
+```{r prep}
+# set seed to improve reproducibility
+set.seed(23525)
+
+# summary data as in slides
+diabetesCounts <- data.frame(count=c(434,66,110,158),
+                             Diabetic=c(FALSE,FALSE,TRUE,TRUE),
+                             Prediction=c(FALSE,TRUE,FALSE,TRUE))
+
+diabetesCounts
+
+# expand data into individuals
+#  (essentially the reverse of forming a confusion matrix)
+indices <- Reduce(c,lapply(seq_along(diabetesCounts$count),
+       function(i) replicate(diabetesCounts$count[i],i)))
+# base::sample() is not to be trusted on varying length numeric vectors
+#       one fix is to move in and out of list form.
+#       For discussion see:
+# http://www.win-vector.com/blog/2016/03/sample-monkeys-paw-style-programming-in-r/
+indices <- as.numeric(sample(as.list(indices),length(indices)))
+diabetesIndvid <- diabetesCounts[indices,]
+diabetesIndvid$count <- NULL
+
+head(diabetesIndvid)
+```
+
+```{r summarize1}
+# summarize using common stat methods
+tab <- table(diabetesIndvid)
+print(tab)
+fisher.test(tab)
+```
+
+```{r summarize2}
+# summarize using caret
+library('caret')
+cm <- confusionMatrix(data=diabetesIndvid$Prediction,
+                       reference=diabetesIndvid$Diabetic,
+                       dnn=c("Prediction","Diabetic"),
+                       positive='TRUE')
+print(cm)
+# note: Kappa = (observed accuracy - expected accuracy)/(1 - expected accuracy)
+#  Sensitivity == Recall
+#  Pos Pred Value == Precision
+# help("confusionMatrix")
+```
+
+```{r graph}
+# Graph ROC plot treating categorical prediction as a numeric score.
+# devtools::install_github("WinVector/WVPlots")
+source('../WVPlots/sourceAllWVPlots.R')
+diabetesIndvid$score = as.numeric(diabetesIndvid$Prediction)
+ROCPlot(diabetesIndvid,'score','Diabetic','ROC plot')
+```
+
+AUC is also equal to the the probability a "true" example scores higher than a
+"false" example (both chosen uniformly at random) when ties are counted as 1/2 (
+http://www.win-vector.com/blog/2013/01/more-on-rocauc/ ).
+
+For a classifier that returns two values (a "hard classifier") we also have
+this same probability is equal to the balanced accuracy.
+This can be checked through algebra (see below).
+
+
+```{r aucinterp}
+# Compute AUC.
+# Warning naive method uses time proportional to the square of the number
+# of data rows.
+auc <- function(d,scoreVar,truthVar) {
+  cuts = sort(unique(d[[scoreVar]]))
+  tpr <- function(c) sum( d[[truthVar]] & (d[[scoreVar]]>=c) )/sum(d[[truthVar]])
+  fpr <- function(c) sum( (!d[[truthVar]]) & (d[[scoreVar]]>=c) )/sum(!d[[truthVar]])
+  tprs <- c(1,vapply(cuts,tpr,numeric(1)),0)
+  fprs <- c(1,vapply(cuts,fpr,numeric(1)),0)
+  n <- length(tprs)
+  # Trapezoidal rule exact for piecewise linear data.
+  sum(0.5*(tprs[-n] + tprs[-1])*(fprs[-n]-fprs[-1]))
+}
+
+
+# Compute the probability that a positive example scores above
+# a negative example (ties scored as 1/2).
+# Warning naive method uses time proportional to the square of the number
+# of data rows.
+pTgtF <- function(d,scoreVar,truthVar) {
+  tIdxs <- which(d[[truthVar]])
+  fIdxs <- which(!d[[truthVar]])
+  tot <- 0.0
+  for(i in tIdxs) {
+    for(j in fIdxs) {
+      if(d[[scoreVar]][i]>=d[[scoreVar]][j]) {
+        if(d[[scoreVar]][i]>d[[scoreVar]][j]) {
+          tot <- tot + 1.0
+        } else {
+          tot <- tot + 0.5
+        }
+      }
+    }
+  }
+  tot/(length(tIdxs)*length(fIdxs))
+}
+
+print(paste("auc",auc(diabetesIndvid,'score','Diabetic')))
+print(paste("P[score|true] > P[score|false]",pTgtF(diabetesIndvid,'score','Diabetic')))
+print(paste("Balanced Accuracy",cm$byClass['Balanced Accuracy']))
+```
+

@@ -1,0 +1,58 @@
+---
+title: "VarsViaVtreat"
+author: "Win-Vector LLC"
+date: "March 17, 2016"
+output: html_document
+---
+
+```{r vtreatexample}
+library('ggplot2')
+library('vtreat')
+library('randomForest')
+source("functions.R")
+# devtools::install_github("WinVector/WVPlots")
+source('../WVPlots/sourceAllWVPlots.R')
+
+
+set.seed(12959437)
+coefs = mkCoefs(20)
+nnoise = 2000
+dTrain = mkData(1000, coefs, nnoise)
+vars <- setdiff(colnames(dTrain),'y')
+dCal = mkData(1000, coefs, nnoise)
+dTest = mkData(1000, coefs, nnoise)
+
+cl = parallel::makeCluster(parallel::detectCores())
+treatments <- vtreat::designTreatmentsC(dCal,vars,'y','pos',
+                                        parallelCluster=cl,
+                                        verbose=FALSE)
+if(!require('dplyr')) {
+  scores <- aggregate(sig~origName,treatments$scoreFrame,FUN=min)
+  selectedVars <- sort(scores[scores$sig<=1/length(vars),'origName'])
+} else {
+  treatments$scoreFrame %>% group_by(origName) %>% summarize(sig=min(sig)) %>%
+    filter(sig<=1/length(vars)) -> scores
+  selectedVars = sort(scores$origName)
+}
+print(selectedVars)
+
+dPlot <- dTest[,'y',drop=FALSE]
+
+dBoth <- rbind(dTrain,dCal)
+mAll <- randomForest(x=dBoth[,vars,drop=FALSE],
+                     y=as.factor(dBoth$y))
+dPlot$predAll <- predict(mAll,newdata=dTest,type='prob')[,'pos',drop=TRUE]
+
+# We suggest not using the same data for training and treatment.
+mSel <- randomForest(x=dTrain[,selectedVars,drop=FALSE],
+                     y=as.factor(dTrain$y))
+dPlot$predSel <- predict(mSel,newdata=dTest,type='prob')[,'pos',drop=TRUE]
+
+ROCPlot(dPlot,'predAll','y','model on test with all variables')
+ROCPlot(dPlot,'predSel','y','model on test with selected variables')
+
+if(!is.null(cl)) {
+    parallel::stopCluster(cl)
+    cl = NULL
+}
+```

@@ -1,0 +1,202 @@
+---
+title: "Demonstrating Gain Plots"
+author: "Nina Zumel"
+date: "March 20, 2016"
+output: html_document
+---
+
+Demonstration code for gain plots
+
+First, load all libraries needed for the examples
+```{r}
+library(vtreat) # for variable treatment
+
+# convenience calls for gain plots with additional notation
+source('GainPlotExtra.R')
+
+# set the random number generator seed, so the random assignments are the same every time
+set.seed(45433622) 
+```
+
+# Regression Example.
+
+We will use the Baseball Salaries data, and predict log (base 10) salary via linear regression. The goal is to identify the highest-paid players efficiently.
+
+First, load the data and build the model
+
+```{r}
+# load data
+salaryData = readRDS("salaryData.rds")
+
+# set the outcome variable, and the input variables
+outcome = "logSalary"
+vars = setdiff(colnames(salaryData), c("Salary", "Player", "logSalary"))
+
+nr = nrow(salaryData)
+# make the train/test assignments (set aside 25% of the data for test)
+isTest = runif(nr)<=0.25
+
+# split the data
+test = salaryData[isTest,]
+train = salaryData[!isTest, ]
+
+salaryData$isTest = isTest  # put the test marker back in the data, for reproducibility
+
+# train the linear regression model
+fmla = paste(outcome, "~", paste(vars, collapse="+")) # set up the variables
+model1 = lm(fmla, data=train)
+summary(model1)
+
+# make the predictions on the salaryData frame
+salPred = predict(model1, newdata=salaryData)
+
+# set up a frame with the outcomes
+perf = data.frame(logSalary = salaryData[[outcome]], 
+                  Salary = salaryData$Salary,
+                  pred = salPred, isTest=salaryData$isTest,
+                  predSalary = 10^salPred)
+
+perfTrain = perf[!isTest,]
+perfTest = perf[isTest,]
+
+```
+
+## The Gain Curve
+
+We'll plot the gain curve for the model's performance on the test set. The units will be fractions of salary (not log salary).
+We'll also annotate the graph to mark what fraction of total salary earned was earned by the first 25% of players, as sorted by the model.
+
+For this model, the players in the highest quartile of predicted salary earn just over half the money earned by all players in the league, twice what you expect from selecting players at random.
+
+```{r}
+
+gainx = 0.25  # get the first 25% of players as sorted by the model
+
+tmpfun = function(gx, gy) {
+  pctx = gx*100
+  pcty = gy*100
+  
+  paste("The first ", pctx, "% of players earn\n",
+        pcty, "% of total salary", sep='')
+}
+
+GainCurvePlotWithExtras(perfTest, "predSalary", "Salary", "Baseball Salaries", gainx, tmpfun) 
+  
+
+```
+
+# Classification (Class probabilities) 
+
+Here, we build a logistic regression model to predict the onset of diabetes within 5 years. The goal is to identify the most at-risk subjects efficiently.
+
+Task: Predict the onset of diabetes within 5 years
+
+Load the data and fit the model.
+
+```{r}
+
+d = read.table("pima-indians-diabetes.data.txt", header=FALSE, sep=",", stringsAsFactors=FALSE)
+
+# 1. Number of times pregnant
+# 2. Plasma glucose concentration a 2 hours in an oral glucose tolerance test
+# 3. Diastolic blood pressure (mm Hg)
+# 4. Triceps skin fold thickness (mm)
+# 5. 2-Hour serum insulin (mu U/ml)
+# 6. Body mass index (weight in kg/(height in m)^2)
+# 7. Diabetes pedigree function
+# 8. Age (years)
+# 9. Class variable (0 or 1)
+
+colnames(d) = c("npregnant",
+             "glucose",
+             "blood_pressure",
+             "tricep_skin_fold_thickness",
+             "insulin",
+             "bmi",
+             "diabetes_pedigree",
+             "age",
+             "diabetic")  # 1=diagnosed as diabetic within 5 years/0=not diagnosed after 5 years
+d$diabetic = d$diabetic>0.5 # switch outcome to logical
+
+#
+# Find missing data. Note: although the dataset donors claim there are no missing values, some of the zeros are clearly actually #  # missing values. I am going to treat 0 as 'missing' for glucose, blood_pressure, skin fold thickness, and bmi.
+#
+
+zero_as_missing = c("glucose",
+             "blood_pressure",
+             "tricep_skin_fold_thickness",
+             "bmi")
+leave = setdiff(colnames(d), zero_as_missing)
+
+d0 = as.data.frame(lapply(d[,zero_as_missing], 
+                          FUN=function(x) ifelse(x==0, NA, x)))
+
+d = cbind(d[,leave], d0)
+
+#
+# Set outcome and iput variables, split into training and test
+#
+yColumn = 'diabetic'
+vars = setdiff(colnames(d),c(yColumn, "isTest", "dataLabel"))
+d$isTest = runif(nrow(d))<0.25
+d$dataLabel = ifelse(d$isTest,"test data","train data")
+
+
+# Now treat the missing values, by substituting mean value for them
+# and adding an additional informational column. We will use the vtreat library
+# to do this.
+ 
+
+dtrain = d[!d$isTest, ]
+treatPlan = designTreatmentsC(dtrain, vars, yColumn, TRUE, verbose=FALSE)
+
+dtrainTreat = prepare(treatPlan, dtrain, pruneSig=NULL, doCollar=FALSE)
+# the treated data has all NAs replaced by the mean value of the variable,
+# and additional columns to mark which values were formerly NAs
+head(dtrainTreat)
+# get the new variable names
+newvars = setdiff(colnames(dtrainTreat), yColumn)
+
+# Train the model (glm)
+
+fmla = paste(yColumn, "~", paste(newvars, collapse="+"))
+model2 = glm(fmla, data=dtrainTreat, family=binomial(link="logit"))
+summary(model2)
+
+# Make predictions
+
+# treat all the data first
+dTreat = prepare(treatPlan, d, pruneSig=NULL, doCollar=FALSE)
+
+# put the predictions back into the original frame
+d$model2 = predict(model2, newdata=dTreat, type='response')
+
+dtrain = d[!d$isTest,]
+dtest = d[d$isTest,]
+
+```
+
+## The Gain Curve
+
+Again, we'll annotate the graph to mark what fraction of diabetics were identified by the top 25% riskiest subjects, as sorted by the model.
+
+The highest-risk quartile of subjects according to the model comprise 57% of the subjects who developed diabetes within 5 years.
+
+```{r}
+gainx = 0.25  # get the first 25% riskiest subjects as sorted by the model
+
+tmpfun = function(gx, gy) {
+  pctx = gx*100
+  pcty = gy*100
+  
+  paste("The top ", pctx, "% riskiest subjects\n",
+        "are ", pcty, "% of diabetic cases", sep='')
+}
+
+GainCurvePlotWithExtras(dtest, "model2", "diabetic", "Diabetes", gainx, tmpfun) 
+
+```
+
+
+
+

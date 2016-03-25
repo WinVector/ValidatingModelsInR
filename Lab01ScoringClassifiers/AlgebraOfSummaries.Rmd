@@ -1,0 +1,73 @@
+---
+title: "AlgebraOfSummaries"
+author: "Win-Vector LLC"
+date: "March 19, 2016"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r algebra}
+library('rSymPy')
+
+
+# From help("confusionMatrix") {caret}
+#           Reference	
+# Predicted	Event	No Event
+#      Event	A	    B
+#   No Event	C	    D
+#   
+
+A = Var('TruePositives')
+B = Var('FalsePositives')
+C = Var('FalseNegatives')
+D = Var('TrueNegatives')
+# (A+C) and (B+D) are facts about the data, independent of classifier.
+Sensitivity = A/(A+C)
+Specificity = D/(B+D)
+Prevalence = (A+C)/(A+B+C+D)
+PPV = (Sensitivity * Prevalence)/((Sensitivity*Prevalence) + ((1-Specificity)*(1-Prevalence)))
+NPV = (Specificity * (1-Prevalence))/(((1-Sensitivity)*Prevalence) + ((Specificity)*(1-Prevalence)))
+DetectionRate = A/(A+B+C+D)
+DetectionPrevalence = (A+B)/(A+B+C+D)
+BalancedAccuracy = (Sensitivity+Specificity)/2
+
+
+# From our slides
+FNR = C/(A+C)
+FPR = B/(B+D)
+TPR = A/(A+C)
+FPR = B/(B+D)
+Recall = A/(A+C)
+Precision = A/(A+B)
+
+# Obviously: Sensitivity==TPR==Recall
+
+# Examine rules
+print(FNR)
+
+# Confirm TPR == 1 - FNR
+sympy(paste("simplify(",TPR-(1-FNR),")"))
+
+# Confirm Recall == Sensitivity
+sympy(paste("simplify(",Recall-Sensitivity,")"))
+# Confirm Precision != Specificity
+sympy(paste("simplify(",Precision-Specificity,")"))
+
+# Confirm Prob[score(true)>score(false)]  == BalancedAccuracy FOR Hard Classifier
+PTrueGTFalse = (A*D  + A*B/2 + C*D/2)/((A+C)*(B+D))
+sympy(paste("simplify(",PTrueGTFalse-BalancedAccuracy,")"))
+
+# Confirm  Prob[score(true)>score(false)] (with half point on ties) == AUC
+AUC = (FPR-0)*(0+TPR)/2 + (1-FPR)*(TPR+1)/2
+sympy(paste("simplify(",PTrueGTFalse-AUC,")"))
+  
+# Confirm PPV == Precision
+sympy(paste("simplify(",PPV-Precision,")"))
+
+```
+
+
+

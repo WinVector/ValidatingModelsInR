@@ -1,0 +1,93 @@
+---
+title: "Permutation Tests and Variable Selection"
+author: "Nina Zumel"
+date: "March 16, 2016"
+output: html_document
+---
+
+
+
+For simplicity, we will do this all with glm, and mostly with deviance,
+but in theory this method will determine model significance for any
+modeling method and any metric. However, for variable selection,
+you might as well use a simple and easy to run modeling method like
+glm or lm, regardless of what your final modeling algorithm will be.
+In fact, permutation tests with lm can be made very efficient, because
+you are keeping the same design matrix and only changing the y vector.
+
+```{r modelSignificance}
+source("functions.R")
+# devtools::install_github("WinVector/WVPlots")
+source('../WVPlots/sourceAllWVPlots.R')
+
+
+set.seed(12959437)
+```
+
+## Some Examples of Estimating Model Significance
+
+### A case with signal
+```{r cleandata}
+# clean data
+run_example(ngood=10, nnoise=3,
+            datasize=1000, nperm=500, 'Data with signal')
+```
+
+### A case with no signal
+```{r nosignal}
+run_example(ngood=0, nnoise=10,
+            datasize=1000, nperm=500, 'Data with no signal')
+```
+
+### Bad Bayes: very wide data with no signal
+```{r badbayes}
+run_example(ngood=0, nnoise=300, 
+            datasize=1000, nperm=200, 'Bad Bayes situation')
+```
+
+## Using model significance (chi-squared test) to select variables.
+
+### Data with signal
+```{r varSelclean}
+run_vs_example(ngood=10, nnoise=20,
+               datasize=1000, nperm=200,
+               threshold=0.05, 'Data with signal, threshold p=0.05')
+```
+
+### Wider data with some signal
+```{r varSelnoisySig}
+run_vs_example(ngood=5, nnoise=100,
+               datasize=1000, nperm=200,
+               threshold=0.05, 'Wide data with some signal, threshold p=0.05')
+```
+
+### Data with no signal
+
+You would expect a threshold of 0.05 (or 1/20) to let about one out of every twenty noise variables to slip by. This gives you a rule of thumb for picking the threshold.
+
+```{r varSelnosig}
+# scoring columns, data with no signal
+nnoise = 100
+p=0.05
+# the number of bad variables to expect
+print(nnoise*p)
+
+run_vs_example(ngood=0, nnoise=nnoise,
+               datasize=1000, nperm=200,
+               threshold=p, 'Data with no signal, threshold p=0.05')
+
+
+```
+
+### Bad Bayes
+```{r varSelnosig2}
+nnoise=300
+p=0.01
+# the number of bad variables to expect
+print(nnoise*p)
+
+run_vs_example(ngood=0, nnoise=nnoise, 
+            datasize=1000, nperm=200, 
+            threshold=p, 'Bad Bayes situation, threshold p=0.01')
+
+```
