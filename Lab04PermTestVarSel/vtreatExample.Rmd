@@ -40,12 +40,14 @@ dPlot <- dTest[,'y',drop=FALSE]
 
 dBoth <- rbind(dTrain,dCal)
 mAll <- randomForest(x=dBoth[,vars,drop=FALSE],
-                     y=as.factor(dBoth$y))
+                     y=as.factor(dBoth$y),
+                     ntree=100)
 dPlot$predAll <- predict(mAll,newdata=dTest,type='prob')[,'pos',drop=TRUE]
 
 # We suggest not using the same data for training and treatment.
 mSel <- randomForest(x=dTrain[,selectedVars,drop=FALSE],
-                     y=as.factor(dTrain$y))
+                     y=as.factor(dTrain$y),
+                     ntree=100)
 dPlot$predSel <- predict(mSel,newdata=dTest,type='prob')[,'pos',drop=TRUE]
 
 ROCPlot(dPlot,'predAll','y','model on test with all variables')

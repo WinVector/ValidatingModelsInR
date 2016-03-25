@@ -6,7 +6,7 @@ for(li in labs) {
   setwd(li)
   rmds <- list.files(pattern='.*\\.Rmd')
   for(ri in rmds) {
-    knitr::knit2html(ri)
+    rmarkdown::render(ri)
   }
   setwd(dir)
 }
