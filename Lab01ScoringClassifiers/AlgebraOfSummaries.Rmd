@@ -9,17 +9,22 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-```{r algebra}
+
+From help("confusionMatrix") {caret}:
+
+              Reference	
+    Predicted	Event	No Event
+         Event	A	    B
+      No Event	C	    D
+
+Reference is "ground truth" or actual outcome.  We will call examples that have true ground truth "true examples" (please don't confuse this with "TrueNegatives" which are "false examples" that are correctly scored as being false.
+
+We can encode what we have written about these confusion matrix summaries as alebraic statements.
+
+```{r algebrasetup}
 library('rSymPy')
 
-
-# From help("confusionMatrix") {caret}
-#           Reference	
-# Predicted	Event	No Event
-#      Event	A	    B
-#   No Event	C	    D
-#   
-
+# From help("confusionMatrix") {caret}:
 A = Var('TruePositives')
 B = Var('FalsePositives')
 C = Var('FalseNegatives')
@@ -42,9 +47,13 @@ TPR = A/(A+C)
 FPR = B/(B+D)
 Recall = A/(A+C)
 Precision = A/(A+B)
+```
 
-# Obviously: Sensitivity==TPR==Recall
 
+
+Obviously: Sensitivity==TPR==Recall.  But we can check much more.
+
+```{r algebraderivations}
 # Examine rules
 print(FNR)
 
@@ -53,20 +62,37 @@ sympy(paste("simplify(",TPR-(1-FNR),")"))
 
 # Confirm Recall == Sensitivity
 sympy(paste("simplify(",Recall-Sensitivity,")"))
+
 # Confirm Precision != Specificity
 sympy(paste("simplify(",Precision-Specificity,")"))
 
-# Confirm Prob[score(true)>score(false)]  == BalancedAccuracy FOR Hard Classifier
-PTrueGTFalse = (A*D  + A*B/2 + C*D/2)/((A+C)*(B+D))
-sympy(paste("simplify(",PTrueGTFalse-BalancedAccuracy,")"))
-
-# Confirm  Prob[score(true)>score(false)] (with half point on ties) == AUC
-AUC = (FPR-0)*(0+TPR)/2 + (1-FPR)*(TPR+1)/2
-sympy(paste("simplify(",PTrueGTFalse-AUC,")"))
-  
 # Confirm PPV == Precision
 sympy(paste("simplify(",PPV-Precision,")"))
+```
 
+Confirm Prob[score(true)>score(false)] (with half point on ties) == BalancedAccuracy FOR Hard Classifier.  Reference/Truth/Outcome "True" cases are A and C, "False" cases are B and D.  So the odds of drawing an ordered pair where the first is True and the second is False is: (A+C)*(B+D).  There are also four combinations of how a True example and a False example can be scored as a pair:
+
+    A D : True Positive and True Negative: Correct sorting 1 point
+    A B : True Positive and False Positive (same prediction "Positive", different outcomes): 1/2 point
+    C D : False Negative and True Negative (same prediction "Negative", different outcomes): 1/2 point
+    C B : False Negative and True Negative: Wrong order 0 points
+    
+The conditional expectation of Award[score(true)>score(false)] (1 point if score is right, 1/2 if tie, 0 if wrong) is then given by:
+   
+```{r balancedaccuracy}
+ScoreTrueGTFalse = (1*A*D  + 0.5*A*B + 0.5*C*D + 0*C*B)/((A+C)*(B+D))
+sympy(paste("simplify(",ScoreTrueGTFalse-BalancedAccuracy,")"))
+```
+
+Confirm  Prob[score(true)>score(false)] (with half point on ties) == AUC.  We can compute the AUC of the above confusion matrix by refering to the following diagram.
+
+![ComputingArea](AUC.png)
+
+Then we can check for general equality:
+
+```{r auc}
+AUC = (1/2)*FPR*TPR + (1/2)*(1-FPR)*(1-TPR) + (1-FPR)*TPR
+sympy(paste("simplify(",ScoreTrueGTFalse-AUC,")"))
 ```
 
 
