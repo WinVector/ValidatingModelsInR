@@ -95,5 +95,8 @@ AUC = (1/2)*FPR*TPR + (1/2)*(1-FPR)*(1-TPR) + (1-FPR)*TPR
 sympy(paste("simplify(",ScoreTrueGTFalse-AUC,")"))
 ```
 
+This AUC/Score (with half point credit on ties) equivalence holds in general [More on ROC/AUC](http://www.win-vector.com/blog/2013/01/more-on-rocauc/) (though I, John Mount, got this wrong the first time).
+
+
 
 

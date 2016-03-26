@@ -181,6 +181,7 @@ sympy(paste(&quot;simplify(&quot;,ScoreTrueGTFalse-BalancedAccuracy,&quot;)&quot
 <pre class="r"><code>AUC = (1/2)*FPR*TPR + (1/2)*(1-FPR)*(1-TPR) + (1-FPR)*TPR
 sympy(paste(&quot;simplify(&quot;,ScoreTrueGTFalse-AUC,&quot;)&quot;))</code></pre>
 <pre><code>## [1] &quot;0&quot;</code></pre>
+<p>This AUC/Score (with half point credit on ties) equivalence holds in general <a href="http://www.win-vector.com/blog/2013/01/more-on-rocauc/">More on ROC/AUC</a> (though I, John Mount, got this wrong the first time).</p>
 
 
 
