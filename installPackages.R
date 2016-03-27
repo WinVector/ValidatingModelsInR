@@ -1,6 +1,6 @@
 
 pkgs = c('devtools', 'ROCR', 'ggplot2', 'grid', 'gridExtra', 'plyr',
-         'reshape2', 'dplyr', 'pROC'lib, 'knitr', 'rmarkdown',
+         'reshape2', 'dplyr', 'pROC', 'knitr', 'rmarkdown',
          'stringr', 'RColorBrewer', 'boot',
          'rSymPy', 'randomForest', 'e1071', 'vtreat')
 for(pkgi in pkgs) {
