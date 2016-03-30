@@ -17,12 +17,13 @@ plot_densities = function(frame, column, threshold, title, tail="left"){
                 right= 1- densityfun(threshold)
   )
   text = paste("tail area = ", format(area, digits=2))
+  texty = 4*max(dens$y)/5
   
   ggplot() + 
     geom_line(data=densityframe, aes(x=AUC, y=density), color="darkgray") +
     geom_ribbon(data=densityframe, aes(x=AUC, ymin=0, ymax=tail), fill="darkblue", alpha=0.5) +
-    geom_vline(xintercept=threshold, color="darkblue") + 
-    annotate("text", x=threshold+0.001, y=1, label=text, size=5, hjust="left", vjust="bottom") + 
+    geom_vline(xintercept=threshold, color="darkblue",  linetype=2) + 
+    annotate("text", x=threshold+0.001, y=texty, label=text, size=5, hjust="left", vjust="bottom") + 
     ggtitle(title)
 }  
 

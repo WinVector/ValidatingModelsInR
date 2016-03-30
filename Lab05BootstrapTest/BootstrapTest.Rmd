@@ -69,6 +69,9 @@ resultsGLM <- boot(data=testD, statistic=bs,
 
 bci = boot.ci(resultsGLM,type='basic')
 print(bci)
+glmDev = sd(resultsGLM$t)
+print(glmDev)
+
 ciGLM = bci$basic[, 4:5]
 
 resultsGBM <- boot(data=testD, statistic=bs, 
@@ -78,6 +81,9 @@ resultsGBM <- boot(data=testD, statistic=bs,
 
 bci = boot.ci(resultsGBM,type='basic')
 print(bci)
+gbmDev = sd(resultsGBM$t)
+print(gbmDev)
+
 ciGBM = bci$basic[,4:5]
 
 # auc
@@ -145,6 +151,26 @@ distGLM = ecdf(resultsGLM$t[,1])
 print(1 - distGLM(gbmAUC))  # the right tail
 ```
 
+
+## Follow up: difference of two models on same bootstrap sets
+
+```{r two}
+resultsDiff <- boot(data=testD,
+                   statistic=function(data, indices, scoreColumn) {
+                     d <- data[indices,]
+                     auc1 <- pROC::auc(d$churn,d$gbmPred)
+                     auc2 <- pROC::auc(d$churn,d$glmPred)
+                     return(auc1-auc2)
+                   },
+                   R=100,
+                   parallel='snow', ncpus=parallel::detectCores())
+
+meanDev <- (glmDev+gbmDev)/2
+diffFrame <- data.frame(standardDeviations=resultsDiff$t/meanDev)
+plot_densities(diffFrame, 'standardDeviations', 0.0, 
+         "expected differcence in test AUC\nin standard deviation units",
+         tail="left")
+```
 
 ## Which model would I pick?
 
