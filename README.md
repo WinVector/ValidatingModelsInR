@@ -7,8 +7,8 @@ Github location: https://github.com/WinVector/ValidatingModelsInR
 
 Sessions included:
 
-    * https://github.com/rstudio/RQuickstart
-    * https://github.com/WinVector/ValidatingModelsInR
-    * https://github.com/Quantia-Analytics/Strata-Big-Data-w-R
-    * https://github.com/rstudio/RMarkdownReports
+  *  https://github.com/rstudio/RQuickstart
+  *  https://github.com/WinVector/ValidatingModelsInR
+  *  https://github.com/Quantia-Analytics/Strata-Big-Data-w-R
+  *  https://github.com/rstudio/RMarkdownReports
 
