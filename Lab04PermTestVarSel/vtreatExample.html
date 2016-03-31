@@ -120,39 +120,40 @@ $(document).ready(function () {
 <pre><code>## Warning: package 'ggplot2' was built under R version 3.2.4</code></pre>
 <pre class="r"><code>library('vtreat')
 library('randomForest')</code></pre>
-<pre><code>## randomForest 4.6-12
-## Type rfNews() to see new features/changes/bug fixes.
-## 
-## Attaching package: 'randomForest'
-## 
-## The following object is masked from 'package:ggplot2':
+<pre><code>## randomForest 4.6-12</code></pre>
+<pre><code>## Type rfNews() to see new features/changes/bug fixes.</code></pre>
+<pre><code>## 
+## Attaching package: 'randomForest'</code></pre>
+<pre><code>## The following object is masked from 'package:ggplot2':
 ## 
 ##     margin</code></pre>
 <pre class="r"><code>source(&quot;functions.R&quot;)
-# devtools::install_github(&quot;WinVector/WVPlots&quot;)
-source('../WVPlots/sourceAllWVPlots.R')</code></pre>
-<pre><code>## Loading required package: grid
-## Loading required package: gridExtra</code></pre>
+# install.packages(&quot;devtools&quot;)
+# devtools::install_github(&quot;WinVector/WVPlots&quot;,build_vignettes=TRUE)
+library(&quot;WVPlots&quot;)</code></pre>
+<pre><code>## Loading required package: grid</code></pre>
+<pre><code>## Loading required package: gridExtra</code></pre>
 <pre><code>## Warning: package 'gridExtra' was built under R version 3.2.4</code></pre>
 <pre><code>## 
-## Attaching package: 'gridExtra'
+## Attaching package: 'gridExtra'</code></pre>
+<pre><code>## The following object is masked from 'package:randomForest':
 ## 
-## The following object is masked from 'package:randomForest':
+##     combine</code></pre>
+<pre><code>## Loading required package: reshape2</code></pre>
+<pre><code>## Loading required package: ROCR</code></pre>
+<pre><code>## Loading required package: gplots</code></pre>
+<pre><code>## Warning: package 'gplots' was built under R version 3.2.4</code></pre>
+<pre><code>## 
+## Attaching package: 'gplots'</code></pre>
+<pre><code>## The following object is masked from 'package:stats':
 ## 
-##     combine
-## 
-## Loading required package: reshape2
-## Loading required package: ROCR
-## Loading required package: gplots
-## 
-## Attaching package: 'gplots'
-## 
-## The following object is masked from 'package:stats':
-## 
-##     lowess
-## 
-## Loading required package: plyr
-## Loading required package: stringr</code></pre>
+##     lowess</code></pre>
+<pre><code>## Loading required package: plyr</code></pre>
+<pre><code>## Loading required package: stringr</code></pre>
+<pre><code>## Loading required package: mgcv</code></pre>
+<pre><code>## Loading required package: nlme</code></pre>
+<pre><code>## Warning: package 'nlme' was built under R version 3.2.4</code></pre>
+<pre><code>## This is mgcv 1.8-9. For overview type 'help(&quot;mgcv-package&quot;)'.</code></pre>
 <pre class="r"><code>set.seed(12959437)
 coefs = mkCoefs(20)
 nnoise = 2000
@@ -173,28 +174,26 @@ if(!require('dplyr')) {
     filter(sig&lt;=1/length(vars)) -&gt; scores
   selectedVars = sort(scores$origName)
 }</code></pre>
-<pre><code>## Loading required package: dplyr
+<pre><code>## Loading required package: dplyr</code></pre>
+<pre><code>## 
+## Attaching package: 'dplyr'</code></pre>
+<pre><code>## The following object is masked from 'package:nlme':
 ## 
-## Attaching package: 'dplyr'
-## 
-## The following objects are masked from 'package:plyr':
+##     collapse</code></pre>
+<pre><code>## The following objects are masked from 'package:plyr':
 ## 
 ##     arrange, count, desc, failwith, id, mutate, rename, summarise,
-##     summarize
+##     summarize</code></pre>
+<pre><code>## The following object is masked from 'package:gridExtra':
 ## 
-## The following object is masked from 'package:gridExtra':
+##     combine</code></pre>
+<pre><code>## The following object is masked from 'package:randomForest':
 ## 
-##     combine
+##     combine</code></pre>
+<pre><code>## The following object is masked from 'package:stats':
 ## 
-## The following object is masked from 'package:randomForest':
-## 
-##     combine
-## 
-## The following object is masked from 'package:stats':
-## 
-##     filter
-## 
-## The following objects are masked from 'package:base':
+##     filter</code></pre>
+<pre><code>## The following objects are masked from 'package:base':
 ## 
 ##     intersect, setdiff, setequal, union</code></pre>
 <pre class="r"><code>print(selectedVars)</code></pre>

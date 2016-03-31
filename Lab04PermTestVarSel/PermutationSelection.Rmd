@@ -17,9 +17,9 @@ you are keeping the same design matrix and only changing the y vector.
 
 ```{r modelSignificance}
 source("functions.R")
-# devtools::install_github("WinVector/WVPlots")
-source('../WVPlots/sourceAllWVPlots.R')
-
+# install.packages("devtools")
+# devtools::install_github("WinVector/WVPlots",build_vignettes=TRUE)
+library("WVPlots")
 
 set.seed(12959437)
 ```

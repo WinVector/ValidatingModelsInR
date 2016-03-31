@@ -8,8 +8,9 @@ output: html_document
 Create the data.
 ```{r data}
 library('ggplot2')
-# devtools::install_github("WinVector/WVPlots")
-source('../WVPlots/sourceAllWVPlots.R')
+# install.packages("devtools")
+# devtools::install_github("WinVector/WVPlots",build_vignettes=TRUE)
+library("WVPlots")
 nA = 10
 nB = 4
 

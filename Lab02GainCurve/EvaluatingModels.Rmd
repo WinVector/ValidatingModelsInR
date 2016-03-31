@@ -10,9 +10,9 @@ Demonstration code for gain plots
 First, load all libraries needed for the examples
 ```{r}
 library(vtreat) # for variable treatment
-
-# convenience calls for gain plots with additional notation
-source('GainPlotExtra.R')
+# install.packages("devtools")
+# devtools::install_github("WinVector/WVPlots",build_vignettes=TRUE)
+library(WVPlots)
 
 # set the random number generator seed, so the random assignments are the same every time
 set.seed(45433622) 
@@ -80,7 +80,7 @@ tmpfun = function(gx, gy) {
         pcty, "% of total salary", sep='')
 }
 
-GainCurvePlotWithExtras(perfTest, "predSalary", "Salary", "Baseball Salaries", gainx, tmpfun) 
+GainCurvePlotWithNotation(perfTest, "predSalary", "Salary", "Baseball Salaries", gainx, tmpfun) 
   
 
 ```
@@ -193,7 +193,7 @@ tmpfun = function(gx, gy) {
         "are ", pcty, "% of diabetic cases", sep='')
 }
 
-GainCurvePlotWithExtras(dtest, "model2", "diabetic", "Diabetes", gainx, tmpfun) 
+GainCurvePlotWithNotation(dtest, "model2", "diabetic", "Diabetes", gainx, tmpfun) 
 
 ```
 

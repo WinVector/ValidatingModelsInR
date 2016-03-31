@@ -56,8 +56,9 @@ print(cm)
 
 ```{r graph}
 # Graph ROC plot treating categorical prediction as a numeric score.
-# devtools::install_github("WinVector/WVPlots")
-source('../WVPlots/sourceAllWVPlots.R')
+# install.packages("devtools")
+# devtools::install_github("WinVector/WVPlots",build_vignettes=TRUE)
+library(WVPlots)
 diabetesIndvid$score = as.numeric(diabetesIndvid$Prediction)
 ROCPlot(diabetesIndvid,'score','Diabetic','ROC plot')
 ```

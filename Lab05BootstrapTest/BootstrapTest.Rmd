@@ -21,8 +21,9 @@ print(head(testD))
 Plot the ROC/AUC for the gbm model of churn.
 
 ```{r gbmAUC}
-# devtools::install_github("WinVector/WVPlots")
-source('../WVPlots/sourceAllWVPlots.R')
+# install.packages("devtools")
+# devtools::install_github("WinVector/WVPlots",build_vignettes=TRUE)
+library("WVPlots")
 source('functions.R')
 
 ROCPlot(testD,'gbmPred','churn','gbm model')
@@ -126,7 +127,7 @@ distribution), how unlikely is our observed value glmAUC? Note that this is a on
 
 ```{r specificprobabilityquestion}
 
-plot_densities(pd[pd$model=="gbm",], "AUC", glmAUC, "Estimated probability of observing GBM auc less than observed GLM auc")
+ShadedDensity(pd[pd$model=="gbm",], "AUC", glmAUC, "Estimated probability of observing GBM auc less than observed GLM auc")
 
 # get the probability directly
 
@@ -144,7 +145,7 @@ distribution, how unlikely is our observed value gbmAUC? This is only a one-side
 
 ```{r specificprobabilityquestion2}
 
-plot_densities(pd[pd$model=="glm",], "AUC", gbmAUC, "Estimated probability of observing GLM auc greater than observed GBM auc", tail="right")
+ShadedDensity(pd[pd$model=="glm",], "AUC", gbmAUC, "Estimated probability of observing GLM auc greater than observed GBM auc", tail="right")
 
 # get the probability directly
 distGLM = ecdf(resultsGLM$t[,1])
@@ -167,7 +168,7 @@ resultsDiff <- boot(data=testD,
 
 meanDev <- (glmDev+gbmDev)/2
 diffFrame <- data.frame(standardDeviations=resultsDiff$t/meanDev)
-plot_densities(diffFrame, 'standardDeviations', 0.0, 
+ShadedDensity(diffFrame, 'standardDeviations', 0.0, 
          "Expected difference in test AUC\nin standard deviation units",
          tail="left")
 ```

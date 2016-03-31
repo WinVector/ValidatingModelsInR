@@ -10,8 +10,9 @@ library('ggplot2')
 library('vtreat')
 library('randomForest')
 source("functions.R")
-# devtools::install_github("WinVector/WVPlots")
-source('../WVPlots/sourceAllWVPlots.R')
+# install.packages("devtools")
+# devtools::install_github("WinVector/WVPlots",build_vignettes=TRUE)
+library("WVPlots")
 
 
 set.seed(12959437)
