@@ -168,7 +168,7 @@ resultsDiff <- boot(data=testD,
 meanDev <- (glmDev+gbmDev)/2
 diffFrame <- data.frame(standardDeviations=resultsDiff$t/meanDev)
 plot_densities(diffFrame, 'standardDeviations', 0.0, 
-         "expected differcence in test AUC\nin standard deviation units",
+         "Expected difference in test AUC\nin standard deviation units",
          tail="left")
 ```
 
