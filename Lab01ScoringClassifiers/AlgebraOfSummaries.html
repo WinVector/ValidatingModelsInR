@@ -142,7 +142,6 @@ DetectionRate = A/(A+B+C+D)
 DetectionPrevalence = (A+B)/(A+B+C+D)
 BalancedAccuracy = (Sensitivity+Specificity)/2
 
-
 # From our slides
 FNR = C/(A+C)
 FPR = B/(B+D)
@@ -182,6 +181,46 @@ sympy(paste(&quot;simplify(&quot;,ScoreTrueGTFalse-BalancedAccuracy,&quot;)&quot
 sympy(paste(&quot;simplify(&quot;,ScoreTrueGTFalse-AUC,&quot;)&quot;))</code></pre>
 <pre><code>## [1] &quot;0&quot;</code></pre>
 <p>This AUC/Score (with half point credit on ties) equivalence holds in general <a href="http://www.win-vector.com/blog/2013/01/more-on-rocauc/">More on ROC/AUC</a> (though I, John Mount, got this wrong the first time).</p>
+<div id="f1" class="section level1">
+<h1>F1</h1>
+<pre class="r"><code># Wikipedia https://en.wikipedia.org/wiki/F1_score
+F1 = 2*Precision*Recall/(Precision+Recall)
+F1 = sympy(paste(&quot;simplify(&quot;,F1,&quot;)&quot;))
+print(F1)</code></pre>
+<pre><code>## [1] &quot;2*TruePositives/(FalseNegatives + FalsePositives + 2*TruePositives)&quot;</code></pre>
+<pre class="r"><code>print(BalancedAccuracy)</code></pre>
+<pre><code>## [1] &quot;TrueNegatives/(2*(FalsePositives + TrueNegatives)) + TruePositives/(2*(FalseNegatives + TruePositives))&quot;</code></pre>
+<pre class="r"><code>sub &lt;- function(expr,TruePositives,FalsePositives,FalseNegatives,TrueNegatives) {
+  as.numeric(sympy(paste('float((',expr,').subs({TruePositives:',TruePositives,
+              ',FalsePositives:',FalsePositives,
+              ',FalseNegatives:',FalseNegatives,
+              ',TrueNegatives:',TrueNegatives,'}))')))
+}
+
+# Show F1 and BalancedAccuracy do not always vary together
+TotTrue &lt;- 5
+TotFalse &lt;- 5
+TruePositives &lt;- 3
+TrueNegatives &lt;- 3
+F1a &lt;- sub(F1,
+           TruePositives,TotFalse-TrueNegatives,TotTrue-TruePositives,TrueNegatives)
+BAa &lt;- sub(BalancedAccuracy,
+           TruePositives,TotFalse-TrueNegatives,TotTrue-TruePositives,TrueNegatives)
+TruePositives2 &lt;- TruePositives-1
+TrueNegatives2 &lt;- TrueNegatives+1
+F1b &lt;- sub(F1,
+           TruePositives2,TotFalse-TrueNegatives2,TotTrue-TruePositives2,TrueNegatives2)
+BAb &lt;- sub(BalancedAccuracy,
+           TruePositives2,TotFalse-TrueNegatives2,TotTrue-TruePositives2,TrueNegatives2)
+sign(F1b-F1a)==sign(BAb-BAa)</code></pre>
+<pre><code>## [1] FALSE</code></pre>
+<pre class="r"><code># F1 and Balanced accuracy are scale invarient, so this example works no matter
+# how we scale it.
+print(F1)</code></pre>
+<pre><code>## [1] &quot;2*TruePositives/(FalseNegatives + FalsePositives + 2*TruePositives)&quot;</code></pre>
+<pre class="r"><code>print(BalancedAccuracy)</code></pre>
+<pre><code>## [1] &quot;TrueNegatives/(2*(FalsePositives + TrueNegatives)) + TruePositives/(2*(FalseNegatives + TruePositives))&quot;</code></pre>
+</div>
 
 
 

@@ -39,7 +39,6 @@ DetectionRate = A/(A+B+C+D)
 DetectionPrevalence = (A+B)/(A+B+C+D)
 BalancedAccuracy = (Sensitivity+Specificity)/2
 
-
 # From our slides
 FNR = C/(A+C)
 FPR = B/(B+D)
@@ -97,6 +96,44 @@ sympy(paste("simplify(",ScoreTrueGTFalse-AUC,")"))
 
 This AUC/Score (with half point credit on ties) equivalence holds in general [More on ROC/AUC](http://www.win-vector.com/blog/2013/01/more-on-rocauc/) (though I, John Mount, got this wrong the first time).
 
+# F1
+
+```{r f1}
+# Wikipedia https://en.wikipedia.org/wiki/F1_score
+F1 = 2*Precision*Recall/(Precision+Recall)
+F1 = sympy(paste("simplify(",F1,")"))
+print(F1)
+print(BalancedAccuracy)
+
+sub <- function(expr,TruePositives,FalsePositives,FalseNegatives,TrueNegatives) {
+  as.numeric(sympy(paste('float((',expr,').subs({TruePositives:',TruePositives,
+              ',FalsePositives:',FalsePositives,
+              ',FalseNegatives:',FalseNegatives,
+              ',TrueNegatives:',TrueNegatives,'}))')))
+}
+
+# Show F1 and BalancedAccuracy do not always vary together
+TotTrue <- 5
+TotFalse <- 5
+TruePositives <- 3
+TrueNegatives <- 3
+F1a <- sub(F1,
+           TruePositives,TotFalse-TrueNegatives,TotTrue-TruePositives,TrueNegatives)
+BAa <- sub(BalancedAccuracy,
+           TruePositives,TotFalse-TrueNegatives,TotTrue-TruePositives,TrueNegatives)
+TruePositives2 <- TruePositives-1
+TrueNegatives2 <- TrueNegatives+1
+F1b <- sub(F1,
+           TruePositives2,TotFalse-TrueNegatives2,TotTrue-TruePositives2,TrueNegatives2)
+BAb <- sub(BalancedAccuracy,
+           TruePositives2,TotFalse-TrueNegatives2,TotTrue-TruePositives2,TrueNegatives2)
+sign(F1b-F1a)==sign(BAb-BAa)
+
+# F1 and Balanced accuracy are scale invarient, so this example works no matter
+# how we scale it.
+print(F1)
+print(BalancedAccuracy)
+```
 
 
 
