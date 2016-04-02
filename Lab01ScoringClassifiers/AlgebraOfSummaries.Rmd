@@ -99,7 +99,7 @@ This AUC/Score (with half point credit on ties) equivalence holds in general [Mo
 
 # F1
 
-```{r f1}
+```{r F1}
 # Wikipedia https://en.wikipedia.org/wiki/F1_score
 F1 = 2*Precision*Recall/(Precision+Recall)
 F1 = sympy(paste("simplify(",F1,")"))
@@ -108,20 +108,24 @@ print(BalancedAccuracy)
 
 
 # symbolic substition is very bad way to get values, as it can miss x/0 cases
-sub <- function(expr,TruePositives,FalsePositives,FalseNegatives,TrueNegatives) {
+subSymbolic <- function(expr,
+                        TruePositives,FalsePositives,FalseNegatives,TrueNegatives) {
   as.numeric(sympy(paste('float((',expr,').subs({TruePositives:',TruePositives,
               ',FalsePositives:',FalsePositives,
               ',FalseNegatives:',FalseNegatives,
               ',TrueNegatives:',TrueNegatives,'}))')))
 }
 # bad example: 
-sub(BalancedAccuracy,TruePositives=0,FalsePositives=1,FalseNegatives=0,TrueNegatives=1)
+subSymbolic(BalancedAccuracy,
+            TruePositives=0,FalsePositives=1,FalseNegatives=0,TrueNegatives=1)
 
 # better treatment:
-sub <- function(expr,TruePositives,FalsePositives,FalseNegatives,TrueNegatives) {
+sub <- function(expr,
+                TruePositives,FalsePositives,FalseNegatives,TrueNegatives) {
   eval(expr)
 }
-sub(parse(text=BalancedAccuracy),TruePositives=0,FalsePositives=1,FalseNegatives=0,TrueNegatives=1)
+sub(parse(text=BalancedAccuracy),
+    TruePositives=0,FalsePositives=1,FalseNegatives=0,TrueNegatives=1)
 
 
 print(F1)
@@ -146,14 +150,60 @@ for(TotTrue in 1:5) {
         if((F1a<=0)&&(BAa>0.5)) {
           stop()
         }
-        fi = data.frame(F1=F1a,BalancedAccuracy=BAa)
+        fi = data.frame(
+          TotTrue=TotTrue,
+          TotFalse=TotFalse,
+          TruePositives=TruePositives,FalsePositives=FalsePositives,
+          FalseNegatives=FalseNegatives,TrueNegatives=TrueNegatives,
+          F1=F1a,BalancedAccuracy=BAa,
+          stringsAsFactors = FALSE)
         frm = rbind(frm,fi) # bad n^2 accumulation
       }
     }
   }
 }
 
-ggplot(data=frm,aes(x=F1,y=BalancedAccuracy)) + geom_point()
+ggplot(data=frm,aes(x=F1,y=BalancedAccuracy)) + 
+  geom_point() + 
+  ggtitle("F1 versus balancedAccuarcy/AUC")
+
+# mostly we are exploiting changes in prevalence
+print(frm[(frm$BalancedAccuracy==0.5) & (max(frm[frm$BalancedAccuracy==0.5,'F1'])==frm$F1),])
+
+# but there is some range between the two scores even when 
+# we hold that constant (and equal)
+f55 = frm[(frm$TotTrue==5) & (frm$TotFalse==5),]
+ggplot(data=f55,
+       aes(x=F1,y=BalancedAccuracy)) + 
+  geom_point() +
+  ggtitle("F1 versus balancedAccuarcy/AUC (TotTrue==TotFalse==5)")
+
+# notice in particular a classifier that never says "no"
+# can have a non-trivial looking F1 score (but not BalancedAccuracy/AUC)
+print(f55[(f55$BalancedAccuracy==0.5) & (max(f55[f55$BalancedAccuracy==0.5,'F1'])==f55$F1),])
+
+# For a classifier that never says "no" we have TrueNegatives==FalseNegatives=0
+sympy(paste(F1,'.subs({FalseNegatives:',0,',TrueNegatives:',0,'})'))
+sympy(paste(Prevalence,'.subs({FalseNegatives:',0,',TrueNegatives:',0,'})'))
+
+# If X = FalsePositives/TruePositives we have:
+X = Var('X')
+Prevalance = Var('Prevalance')
+F1AlwaysYes = 2/(X+2)
+PrevalanceAlwaysYes = 1/(X+1)
+solns = sympy(paste('solve(',PrevalanceAlwaysYes,'-Prevalance,X)'))
+solns = gsub('^\\[','',solns)
+solns = gsub('\\]$','',solns)
+solns = strsplit(solns,',')[[1]]
+for(Xvalue in solns) {
+  print(paste("soln",Xvalue))
+  PrevalanceAlwaysYesV = 
+    sympy(paste('simplify((',PrevalanceAlwaysYes,').subs({X:',Xvalue,'}))'))
+  print(paste("would entail Prevalance: ",PrevalanceAlwaysYesV))
+  F1AlwaysYesV = 
+    sympy(paste('simplify((',F1AlwaysYes,').subs({X:',Xvalue,'}))'))
+  print(paste("would entail F1: ",F1AlwaysYesV))
+}
 ```
 
 
