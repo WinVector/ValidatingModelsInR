@@ -7,6 +7,7 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library('ggplot2')
 ```
 
 
@@ -112,27 +113,29 @@ sub <- function(expr,TruePositives,FalsePositives,FalseNegatives,TrueNegatives) 
               ',TrueNegatives:',TrueNegatives,'}))')))
 }
 
-# Show F1 and BalancedAccuracy do not always vary together
-TotTrue <- 5
-TotFalse <- 5
-TruePositives <- 3
-TrueNegatives <- 3
-F1a <- sub(F1,
-           TruePositives,TotFalse-TrueNegatives,TotTrue-TruePositives,TrueNegatives)
-BAa <- sub(BalancedAccuracy,
-           TruePositives,TotFalse-TrueNegatives,TotTrue-TruePositives,TrueNegatives)
-TruePositives2 <- TruePositives-1
-TrueNegatives2 <- TrueNegatives+1
-F1b <- sub(F1,
-           TruePositives2,TotFalse-TrueNegatives2,TotTrue-TruePositives2,TrueNegatives2)
-BAb <- sub(BalancedAccuracy,
-           TruePositives2,TotFalse-TrueNegatives2,TotTrue-TruePositives2,TrueNegatives2)
-sign(F1b-F1a)==sign(BAb-BAa)
-
-# F1 and Balanced accuracy are scale invarient, so this example works no matter
-# how we scale it.
 print(F1)
 print(BalancedAccuracy)
+
+# Show F1 and BalancedAccuracy do not always vary together (even for hard classifiers)
+frm = c()
+for(TotTrue in 0:5) {
+  for(TotFalse in 0:5) {
+    for(TruePositives in 0:TotTrue) {
+      for(TrueNegatives in 0:TotFalse) {
+        if( ((TotFalse-TrueNegatives)>=0) && ((TotTrue-TruePositives)>0) ) {
+          F1a <- sub(F1,
+                     TruePositives,TotFalse-TrueNegatives,TotTrue-TruePositives,TrueNegatives)
+          BAa <- sub(BalancedAccuracy,
+                     TruePositives,TotFalse-TrueNegatives,TotTrue-TruePositives,TrueNegatives)
+          fi = data.frame(F1=F1a,BalancedAccuracy=BAa)
+          frm = rbind(frm,fi) # bad n^2 accumulation
+        }
+      }
+    }
+  }
+}
+
+ggplot(data=frm,aes(x=F1,y=BalancedAccuracy)) + geom_point()
 ```
 
 
