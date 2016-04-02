@@ -106,30 +106,48 @@ F1 = sympy(paste("simplify(",F1,")"))
 print(F1)
 print(BalancedAccuracy)
 
+
+# symbolic substition is very bad way to get values, as it can miss x/0 cases
 sub <- function(expr,TruePositives,FalsePositives,FalseNegatives,TrueNegatives) {
   as.numeric(sympy(paste('float((',expr,').subs({TruePositives:',TruePositives,
               ',FalsePositives:',FalsePositives,
               ',FalseNegatives:',FalseNegatives,
               ',TrueNegatives:',TrueNegatives,'}))')))
 }
+# bad example: 
+sub(BalancedAccuracy,TruePositives=0,FalsePositives=1,FalseNegatives=0,TrueNegatives=1)
+
+# better treatment:
+sub <- function(expr,TruePositives,FalsePositives,FalseNegatives,TrueNegatives) {
+  eval(expr)
+}
+sub(parse(text=BalancedAccuracy),TruePositives=0,FalsePositives=1,FalseNegatives=0,TrueNegatives=1)
+
 
 print(F1)
 print(BalancedAccuracy)
 
 # Show F1 and BalancedAccuracy do not always vary together (even for hard classifiers)
+F1formula = parse(text=F1)
+BAformula = parse(text=BalancedAccuracy)
 frm = c()
-for(TotTrue in 0:5) {
-  for(TotFalse in 0:5) {
+for(TotTrue in 1:5) {
+  for(TotFalse in 1:5) {
     for(TruePositives in 0:TotTrue) {
       for(TrueNegatives in 0:TotFalse) {
-        if( ((TotFalse-TrueNegatives)>=0) && ((TotTrue-TruePositives)>0) ) {
-          F1a <- sub(F1,
-                     TruePositives,TotFalse-TrueNegatives,TotTrue-TruePositives,TrueNegatives)
-          BAa <- sub(BalancedAccuracy,
-                     TruePositives,TotFalse-TrueNegatives,TotTrue-TruePositives,TrueNegatives)
-          fi = data.frame(F1=F1a,BalancedAccuracy=BAa)
-          frm = rbind(frm,fi) # bad n^2 accumulation
+        FalsePositives = TotFalse-TrueNegatives
+        FalseNegatives = TotTrue-TruePositives
+        F1a <- sub(F1formula,
+                   TruePositives=TruePositives,FalsePositives=FalsePositives,
+                   FalseNegatives=FalseNegatives,TrueNegatives=TrueNegatives)
+        BAa <- sub(BAformula,
+                   TruePositives=TruePositives,FalsePositives=FalsePositives,
+                   FalseNegatives=FalseNegatives,TrueNegatives=TrueNegatives)
+        if((F1a<=0)&&(BAa>0.5)) {
+          stop()
         }
+        fi = data.frame(F1=F1a,BalancedAccuracy=BAa)
+        frm = rbind(frm,fi) # bad n^2 accumulation
       }
     }
   }
