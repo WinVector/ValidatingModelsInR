@@ -183,20 +183,33 @@ ggplot(data=f55,
 print(f55[(f55$BalancedAccuracy==0.5) & (max(f55[f55$BalancedAccuracy==0.5,'F1'])==f55$F1),])
 
 # For a classifier that never says "no" we have TrueNegatives==FalseNegatives=0
-sympy(paste(F1,'.subs({FalseNegatives:',0,',TrueNegatives:',0,'})'))
-sympy(paste(Prevalence,'.subs({FalseNegatives:',0,',TrueNegatives:',0,'})'))
+F1Simp =
+  sympy(paste(F1,'.subs({FalseNegatives:',0,',TrueNegatives:',0,'})'))
+print(F1Simp)
+PrevalenceSimp = 
+  sympy(paste(Prevalence,'.subs({FalseNegatives:',0,',TrueNegatives:',0,'})'))
+print(PrevalenceSimp)
 
 # If X = FalsePositives/TruePositives we have:
 X = Var('X')
-Prevalance = Var('Prevalance')
 F1AlwaysYes = 2/(X+2)
 PrevalanceAlwaysYes = 1/(X+1)
+# confirm substitutions
+sympy(paste0('simplify(',F1Simp,
+             ' - (',F1AlwaysYes,
+             ').subs({X:FalsePositives/TruePositives}))'))
+sympy(paste0('simplify(',PrevalenceSimp,
+             ' - (',PrevalanceAlwaysYes,
+             ').subs({X:FalsePositives/TruePositives}))'))
+
+# sovle
+PrevalanceV = Var('Prevalance')
 solns = sympy(paste('solve(',PrevalanceAlwaysYes,'-Prevalance,X)'))
 solns = gsub('^\\[','',solns)
 solns = gsub('\\]$','',solns)
 solns = strsplit(solns,',')[[1]]
 for(Xvalue in solns) {
-  print(paste("soln",Xvalue))
+  print(paste("x soln",Xvalue))
   PrevalanceAlwaysYesV = 
     sympy(paste('simplify((',PrevalanceAlwaysYes,').subs({X:',Xvalue,'}))'))
   print(paste("would entail Prevalance: ",PrevalanceAlwaysYesV))
@@ -204,6 +217,12 @@ for(Xvalue in solns) {
     sympy(paste('simplify((',F1AlwaysYes,').subs({X:',Xvalue,'}))'))
   print(paste("would entail F1: ",F1AlwaysYesV))
 }
+
+# So F1 is 2*Prevalance/(1 + Prevalance) for classifiers that never say "no."
+
+# confirm
+sympy(paste0('simplify(',F1Simp,
+             ' - 2*(',PrevalenceSimp,')/(1+(',PrevalenceSimp,')))'))
 ```
 
 
