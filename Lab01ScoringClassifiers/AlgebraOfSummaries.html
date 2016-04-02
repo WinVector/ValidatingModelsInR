@@ -283,38 +283,38 @@ print(PrevalenceSimp)</code></pre>
 <pre class="r"><code># If X = FalsePositives/TruePositives we have:
 X = Var('X')
 F1AlwaysYes = 2/(X+2)
-PrevalanceAlwaysYes = 1/(X+1)
+PrevalenceAlwaysYes = 1/(X+1)
 # confirm substitutions
 sympy(paste0('simplify(',F1Simp,
              ' - (',F1AlwaysYes,
              ').subs({X:FalsePositives/TruePositives}))'))</code></pre>
 <pre><code>## [1] &quot;0&quot;</code></pre>
 <pre class="r"><code>sympy(paste0('simplify(',PrevalenceSimp,
-             ' - (',PrevalanceAlwaysYes,
+             ' - (',PrevalenceAlwaysYes,
              ').subs({X:FalsePositives/TruePositives}))'))</code></pre>
 <pre><code>## [1] &quot;0&quot;</code></pre>
 <pre class="r"><code># sovle
-PrevalanceV = Var('Prevalance')
-solns = sympy(paste('solve(',PrevalanceAlwaysYes,'-Prevalance,X)'))
+PrevalenceV = Var('Prevalence')
+solns = sympy(paste('solve(',PrevalenceAlwaysYes,'-Prevalence,X)'))
 solns = gsub('^\\[','',solns)
 solns = gsub('\\]$','',solns)
 solns = strsplit(solns,',')[[1]]
 for(Xvalue in solns) {
   print(paste(&quot;x soln&quot;,Xvalue))
-  PrevalanceAlwaysYesV = 
-    sympy(paste('simplify((',PrevalanceAlwaysYes,').subs({X:',Xvalue,'}))'))
-  print(paste(&quot;would entail Prevalance: &quot;,PrevalanceAlwaysYesV))
+  PrevalenceAlwaysYesV = 
+    sympy(paste('simplify((',PrevalenceAlwaysYes,').subs({X:',Xvalue,'}))'))
+  print(paste(&quot;would entail Prevalence: &quot;,PrevalenceAlwaysYesV))
   F1AlwaysYesV = 
     sympy(paste('simplify((',F1AlwaysYes,').subs({X:',Xvalue,'}))'))
   print(paste(&quot;would entail F1: &quot;,F1AlwaysYesV))
 }</code></pre>
 <pre><code>## [1] &quot;x soln 0&quot;
-## [1] &quot;would entail Prevalance:  1&quot;
+## [1] &quot;would entail Prevalence:  1&quot;
 ## [1] &quot;would entail F1:  1&quot;
-## [1] &quot;x soln  (1 - Prevalance)/Prevalance&quot;
-## [1] &quot;would entail Prevalance:  Prevalance&quot;
-## [1] &quot;would entail F1:  2*Prevalance/(1 + Prevalance)&quot;</code></pre>
-<pre class="r"><code># So F1 is 2*Prevalance/(1 + Prevalance) for classifiers that never say &quot;no.&quot;
+## [1] &quot;x soln  (1 - Prevalence)/Prevalence&quot;
+## [1] &quot;would entail Prevalence:  Prevalence&quot;
+## [1] &quot;would entail F1:  2*Prevalence/(1 + Prevalence)&quot;</code></pre>
+<pre class="r"><code># So F1 is 2*Prevalence/(1 + Prevalence) for classifiers that never say &quot;no.&quot;
 
 # confirm
 sympy(paste0('simplify(',F1Simp,
