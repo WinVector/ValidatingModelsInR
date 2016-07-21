@@ -70,21 +70,21 @@ sympy(paste("simplify(",Precision-Specificity,")"))
 sympy(paste("simplify(",PPV-Precision,")"))
 ```
 
-Confirm Prob[score(true)>score(false)] (with half point on ties) == BalancedAccuracy FOR Hard Classifier.  Reference/Truth/Outcome "True" cases are A and C, "False" cases are B and D.  So the odds of drawing an ordered pair where the first is True and the second is False is: (A+C)*(B+D).  There are also four combinations of how a True example and a False example can be scored as a pair:
+Confirm Prob[score(true)>score(false)] (with half point on ties) == BalancedAccuracy for Hard Classifier.  Reference/Truth/Outcome "True" cases are A and C, "False" cases are B and D.  So the odds of drawing an ordered pair where the first is True and the second is False is: (A+C)*(B+D).  There are also four combinations of how a True example and a False example can be scored as a pair:
 
     A D : True Positive and True Negative: Correct sorting 1 point
     A B : True Positive and False Positive (same prediction "Positive", different outcomes): 1/2 point
     C D : False Negative and True Negative (same prediction "Negative", different outcomes): 1/2 point
     C B : False Negative and True Negative: Wrong order 0 points
     
-The conditional expectation of Award[score(true)>score(false)] (1 point if score is right, 1/2 if tie, 0 if wrong) is then given by:
+The conditional expectation of `Award[score(true)>score(false)]` (1 point if score is right, 1/2 if tie, 0 if wrong) is then given by:
    
 ```{r balancedaccuracy}
 ScoreTrueGTFalse = (1*A*D  + 0.5*A*B + 0.5*C*D + 0*C*B)/((A+C)*(B+D))
 sympy(paste("simplify(",ScoreTrueGTFalse-BalancedAccuracy,")"))
 ```
 
-Confirm  Prob[score(true)>score(false)] (with half point on ties) == AUC.  We can compute the AUC of the above confusion matrix by refering to the following diagram.
+Confirm `Prob[score(true)>score(false)]` (with half point on ties) == AUC.  We can compute the AUC of the above confusion matrix by refering to the following diagram.
 
 ![ComputingArea](AUC.png)
 
@@ -202,7 +202,7 @@ sympy(paste0('simplify(',PrevalenceSimp,
              ' - (',PrevalenceAlwaysYes,
              ').subs({X:FalsePositives/TruePositives}))'))
 
-# sovle
+# solve
 PrevalenceV = Var('Prevalence')
 solns = sympy(paste('solve(',PrevalenceAlwaysYes,'-Prevalence,X)'))
 solns = gsub('^\\[','',solns)
