@@ -150,10 +150,10 @@ DetectionPrevalence = (A+B)/(A+B+C+D)
 BalancedAccuracy = (Sensitivity+Specificity)/2
 
 # From our slides
-FNR = C/(A+C)
-FPR = B/(B+D)
-TPR = A/(A+C)
-FPR = B/(B+D)
+TPR = A/(A+C)     # True Positive Rate
+FPR = B/(B+D)     # False Positive Rate
+FNR = C/(A+C)     # False Negative Rate
+TNR = D/(B+D)     # True Negative Rate
 Recall = A/(A+C)
 Precision = A/(A+B)</code></pre>
 <p>Obviously: Sensitivity==TPR==Recall. But we can check much more.</p>
