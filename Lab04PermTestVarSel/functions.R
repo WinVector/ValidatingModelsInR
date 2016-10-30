@@ -86,7 +86,7 @@ performance_eval = function(predScore, truth, posclass,
 
   if(verbose) {
     if(length(unique(data$pred))>1) {
-      print(ROCPlot(data,'predScore','y',title=paste(title,'ROC plot')))
+      print(ROCPlot(data,'predScore','y',posclass,title=paste(title,'ROC plot')))
     }
   }
   output = data.frame(deviance=deviance, label=title)

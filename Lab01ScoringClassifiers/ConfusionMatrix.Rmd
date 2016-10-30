@@ -60,7 +60,7 @@ print(cm)
 # devtools::install_github("WinVector/WVPlots",build_vignettes=TRUE)
 library(WVPlots)
 diabetesIndvid$score = as.numeric(diabetesIndvid$Prediction)
-ROCPlot(diabetesIndvid,'score','Diabetic','ROC plot')
+ROCPlot(diabetesIndvid,'score','Diabetic',TRUE,'ROC plot')
 ```
 
 AUC is also equal to the the probability a "true" example scores higher than a

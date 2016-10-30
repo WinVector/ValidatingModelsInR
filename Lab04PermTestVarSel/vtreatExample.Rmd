@@ -51,8 +51,8 @@ mSel <- randomForest(x=dTrain[,selectedVars,drop=FALSE],
                      ntree=100)
 dPlot$predSel <- predict(mSel,newdata=dTest,type='prob')[,'pos',drop=TRUE]
 
-ROCPlot(dPlot,'predAll','y','model on test with all variables')
-ROCPlot(dPlot,'predSel','y','model on test with selected variables')
+ROCPlot(dPlot,'predAll','y','pos','model on test with all variables')
+ROCPlot(dPlot,'predSel','y','pos','model on test with selected variables')
 
 if(!is.null(cl)) {
     parallel::stopCluster(cl)

@@ -26,7 +26,7 @@ Plot the ROC/AUC for the gbm model of churn.
 library("WVPlots")
 source('functions.R')
 
-ROCPlot(testD,'gbmPred','churn','gbm model')
+ROCPlot(testD,'gbmPred','churn',TRUE,'gbm model')
 gbmAUC = as.numeric(pROC::auc(testD$churn,testD$gbmPred))
 print(gbmAUC)
 ```
@@ -34,7 +34,7 @@ print(gbmAUC)
 Plot the ROC/AUC for the glm model of churn.
 
 ```{r glmAUC}
-ROCPlot(testD,'glmPred','churn','glm model')
+ROCPlot(testD,'glmPred','churn',TRUE,'glm model')
 glmAUC = as.numeric(pROC::auc(testD$churn,testD$glmPred))
 print(glmAUC)
 ```
