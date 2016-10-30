@@ -7,7 +7,7 @@ for(li in labs) {
   print(date())
   print(li)
   setwd(li)
-  rmds <- list.files(pattern='.*\\.Rmd')
+  rmds <- list.files(pattern='.*\\.Rmd$')
   for(ri in rmds) {
     rmarkdown::render(ri)
   }

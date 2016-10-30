@@ -2,7 +2,9 @@
 title: "Demonstrating Gain Plots"
 author: "Nina Zumel"
 date: "March 20, 2016"
-output: html_document
+output:
+  md_document:
+    variant: markdown_github
 ---
 
 Demonstration code for gain plots

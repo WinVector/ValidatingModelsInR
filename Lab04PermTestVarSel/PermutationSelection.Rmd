@@ -2,7 +2,9 @@
 title: "Permutation Tests and Variable Selection"
 author: "Nina Zumel"
 date: "March 16, 2016"
-output: html_document
+output:
+  md_document:
+    variant: markdown_github
 ---
 
 

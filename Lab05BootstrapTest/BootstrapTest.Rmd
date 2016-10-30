@@ -2,7 +2,9 @@
 title: "BootstrapTest"
 author: "Win-Vector LLC"
 date: "March 16, 2016"
-output: html_document
+output:
+  md_document:
+    variant: markdown_github
 ---
 
 ## Example task: compare two models and decide which (or if) one is better

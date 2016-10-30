@@ -1,16 +1,25 @@
----
-title: "VarsViaVtreat"
-author: "Win-Vector LLC"
-date: "March 17, 2016"
-output:
-  md_document:
-    variant: markdown_github
----
-
-```{r vtreatexample}
+``` r
 library('ggplot2')
 library('vtreat')
 library('randomForest')
+```
+
+    ## randomForest 4.6-12
+
+    ## Type rfNews() to see new features/changes/bug fixes.
+
+    ## 
+    ## Attaching package: 'randomForest'
+
+    ## The following object is masked from 'package:gridExtra':
+    ## 
+    ##     combine
+
+    ## The following object is masked from 'package:ggplot2':
+    ## 
+    ##     margin
+
+``` r
 source("functions.R")
 # install.packages("devtools")
 # devtools::install_github("WinVector/WVPlots",build_vignettes=TRUE)
@@ -37,8 +46,46 @@ if(!require('dplyr')) {
     filter(sig<=1/length(vars)) -> scores
   selectedVars = sort(scores$origName)
 }
-print(selectedVars)
+```
 
+    ## Loading required package: dplyr
+
+    ## 
+    ## Attaching package: 'dplyr'
+
+    ## The following object is masked from 'package:randomForest':
+    ## 
+    ##     combine
+
+    ## The following object is masked from 'package:nlme':
+    ## 
+    ##     collapse
+
+    ## The following objects are masked from 'package:plyr':
+    ## 
+    ##     arrange, count, desc, failwith, id, mutate, rename, summarise,
+    ##     summarize
+
+    ## The following object is masked from 'package:gridExtra':
+    ## 
+    ##     combine
+
+    ## The following objects are masked from 'package:stats':
+    ## 
+    ##     filter, lag
+
+    ## The following objects are masked from 'package:base':
+    ## 
+    ##     intersect, setdiff, setequal, union
+
+``` r
+print(selectedVars)
+```
+
+    ##  [1] "g_1"    "g_10"   "g_12"   "g_13"   "g_14"   "g_16"   "g_17"  
+    ##  [8] "g_19"   "g_3"    "g_7"    "g_9"    "n_1171" "n_686"
+
+``` r
 dPlot <- dTest[,'y',drop=FALSE]
 
 dBoth <- rbind(dTrain,dCal)
@@ -54,8 +101,17 @@ mSel <- randomForest(x=dTrain[,selectedVars,drop=FALSE],
 dPlot$predSel <- predict(mSel,newdata=dTest,type='prob')[,'pos',drop=TRUE]
 
 ROCPlot(dPlot,'predAll','y','pos','model on test with all variables')
-ROCPlot(dPlot,'predSel','y','pos','model on test with selected variables')
+```
 
+![](vtreatExample_files/figure-markdown_github/vtreatexample-1.png)
+
+``` r
+ROCPlot(dPlot,'predSel','y','pos','model on test with selected variables')
+```
+
+![](vtreatExample_files/figure-markdown_github/vtreatexample-2.png)
+
+``` r
 if(!is.null(cl)) {
     parallel::stopCluster(cl)
     cl = NULL
