@@ -5,7 +5,29 @@ source("functions.R")
 # install.packages("devtools")
 # devtools::install_github("WinVector/WVPlots",build_vignettes=TRUE)
 library("WVPlots")
+```
 
+    ## Loading required package: ggplot2
+
+    ## Loading required package: grid
+
+    ## Loading required package: gridExtra
+
+    ## Loading required package: reshape2
+
+    ## Loading required package: plyr
+
+    ## Loading required package: stringr
+
+    ## Loading required package: mgcv
+
+    ## Loading required package: nlme
+
+    ## This is mgcv 1.8-14. For overview type 'help("mgcv-package")'.
+
+    ## Loading required package: sigr
+
+``` r
 set.seed(12959437)
 ```
 
@@ -27,7 +49,7 @@ run_example(ngood=10, nnoise=3,
     ##  0.5927275  0.5463776 -1.0104262 -0.7135154 
     ## [1] "Data with signal : training prevalence =  0.488 null deviance of mean = 1385.71830581115"
 
-![](PermutationSelection_files/figure-markdown_github/cleandata-1.png)
+![](PermutationSelection_files/figure-markdown_github/cleandata-1.png)![](PermutationSelection_files/figure-markdown_github/cleandata-2.png)
 
     ## [1] "Compare training and test performance estimates, Data with signal"
     ##   deviance                     label
@@ -38,7 +60,7 @@ run_example(ngood=10, nnoise=3,
     ##    1349    1369    1373    1373    1377    1383 
     ## [1] "Left tail area, deviance 0"
 
-![](PermutationSelection_files/figure-markdown_github/cleandata-2.png)
+![](PermutationSelection_files/figure-markdown_github/cleandata-3.png)
 
 ### A case with no signal
 
@@ -47,20 +69,20 @@ run_example(ngood=0, nnoise=10,
             datasize=1000, nperm=500, 'Data with no signal')
 ```
 
-    ## [1] "Data with no signal : training prevalence =  0.478 null deviance of mean = 1384.35773595297"
+    ## [1] "Data with no signal : training prevalence =  0.505 null deviance of mean = 1386.19435945316"
 
-![](PermutationSelection_files/figure-markdown_github/nosignal-1.png)
+![](PermutationSelection_files/figure-markdown_github/nosignal-1.png)![](PermutationSelection_files/figure-markdown_github/nosignal-2.png)
 
     ## [1] "Compare training and test performance estimates, Data with no signal"
     ##   deviance                        label
-    ## 1 1378.063 Data with no signal Training
-    ## 2 1392.584     Data with no signal Test
+    ## 1 1368.208 Data with no signal Training
+    ## 2 1398.970     Data with no signal Test
     ## [1] "Training performance compared to permutation test results"
     ##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-    ##    1357    1372    1375    1374    1377    1383 
-    ## [1] "Left tail area, deviance 0.824"
+    ##    1358    1374    1377    1376    1379    1384 
+    ## [1] "Left tail area, deviance 0.052"
 
-![](PermutationSelection_files/figure-markdown_github/nosignal-2.png)
+![](PermutationSelection_files/figure-markdown_github/nosignal-3.png)
 
 ### Bad Bayes: very wide data with no signal
 
@@ -69,20 +91,20 @@ run_example(ngood=0, nnoise=300,
             datasize=1000, nperm=200, 'Bad Bayes situation')
 ```
 
-    ## [1] "Bad Bayes situation : training prevalence =  0.518 null deviance of mean = 1384.99808103867"
+    ## [1] "Bad Bayes situation : training prevalence =  0.502 null deviance of mean = 1386.27836107722"
 
-![](PermutationSelection_files/figure-markdown_github/badbayes-1.png)
+![](PermutationSelection_files/figure-markdown_github/badbayes-1.png)![](PermutationSelection_files/figure-markdown_github/badbayes-2.png)
 
     ## [1] "Compare training and test performance estimates, Bad Bayes situation"
     ##   deviance                        label
-    ## 1 1023.542 Bad Bayes situation Training
-    ## 2 2155.707     Bad Bayes situation Test
+    ## 1 1040.921 Bad Bayes situation Training
+    ## 2 2101.082     Bad Bayes situation Test
     ## [1] "Training performance compared to permutation test results"
     ##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-    ##   914.6  1003.0  1028.0  1025.0  1044.0  1095.0 
-    ## [1] "Left tail area, deviance 0.465"
+    ##   911.7  1008.0  1029.0  1027.0  1048.0  1098.0 
+    ## [1] "Left tail area, deviance 0.66"
 
-![](PermutationSelection_files/figure-markdown_github/badbayes-2.png)
+![](PermutationSelection_files/figure-markdown_github/badbayes-3.png)
 
 Using model significance (chi-squared test) to select variables.
 ----------------------------------------------------------------
@@ -99,20 +121,20 @@ run_vs_example(ngood=10, nnoise=20,
 
     ## [1] "Coefficients of true signal variables:"
     ##         g_1         g_2         g_3         g_4         g_5         g_6 
-    ## -1.99475022 -0.28044429 -0.43687434 -2.03531353  0.03543782 -0.81308889 
+    ## -1.19547881 -1.07062960  1.72491030 -1.00080352  0.54413502 -1.21773138 
     ##         g_7         g_8         g_9        g_10 
-    ## -0.28042344 -0.45561740  1.65888855  0.05908969 
+    ##  0.01662549  0.34254521 -0.65799357 -0.05733356 
     ## [1] "Selected variables (permutation):"
-    ## [1] "g_1" "g_2" "g_3" "g_4" "g_6" "g_7" "g_8" "g_9"
+    ## [1] "g_1" "g_2" "g_3" "g_4" "g_5" "g_6" "g_8" "g_9"
     ## [1] "Selected variables (chi-squared):"
-    ## [1] "g_1"  "g_2"  "g_3"  "g_4"  "g_6"  "g_7"  "g_8"  "g_9"  "n_12"
+    ## [1] "g_1" "g_2" "g_3" "g_4" "g_5" "g_6" "g_8" "g_9"
     ## [1] " ========= Compare full and reduced models (holdout performance) =========="
 
 ![](PermutationSelection_files/figure-markdown_github/varSelclean-3.png)![](PermutationSelection_files/figure-markdown_github/varSelclean-4.png)
 
     ##   deviance                                            label
-    ## 1 435.0796    Data with signal, threshold p=0.05 full model
-    ## 2 402.7902 Data with signal, threshold p=0.05 reduced model
+    ## 1 522.0049    Data with signal, threshold p=0.05 full model
+    ## 2 503.8607 Data with signal, threshold p=0.05 reduced model
 
 ### Wider data with some signal
 
@@ -122,28 +144,22 @@ run_vs_example(ngood=5, nnoise=100,
                threshold=0.05, 'Wide data with some signal, threshold p=0.05')
 ```
 
-![](PermutationSelection_files/figure-markdown_github/varSelnoisySig-1.png)
+![](PermutationSelection_files/figure-markdown_github/varSelnoisySig-1.png)![](PermutationSelection_files/figure-markdown_github/varSelnoisySig-2.png)
 
     ## [1] "Coefficients of true signal variables:"
-    ##        g_1        g_2        g_3        g_4        g_5 
-    ## -0.9821458 -0.2626748 -1.7964945 -2.2394453 -0.5700087 
+    ##         g_1         g_2         g_3         g_4         g_5 
+    ## -0.10628577  0.05610456 -0.66233581 -0.18929396  1.17184538 
     ## [1] "Selected variables (permutation):"
-    ##  [1] "g_1"   "g_3"   "g_4"   "g_5"   "n_32"  "n_50"  "n_83"  "n_96" 
-    ##  [9] "n_99"  "n_100"
+    ## [1] "g_3"  "g_4"  "g_5"  "n_13" "n_17" "n_41"
     ## [1] "Selected variables (chi-squared):"
-    ## [1] "g_1"   "g_3"   "g_4"   "g_5"   "n_24"  "n_32"  "n_50"  "n_96"  "n_100"
-
-    ## Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred
-
-![](PermutationSelection_files/figure-markdown_github/varSelnoisySig-2.png)
-
+    ## [1] "g_3"  "g_4"  "g_5"  "n_13" "n_41" "n_79" "n_94"
     ## [1] " ========= Compare full and reduced models (holdout performance) =========="
 
 ![](PermutationSelection_files/figure-markdown_github/varSelnoisySig-3.png)![](PermutationSelection_files/figure-markdown_github/varSelnoisySig-4.png)
 
-    ##   deviance                                                      label
-    ## 1 978.8872    Wide data with some signal, threshold p=0.05 full model
-    ## 2 513.8200 Wide data with some signal, threshold p=0.05 reduced model
+    ##    deviance                                                      label
+    ## 1 1073.1865    Wide data with some signal, threshold p=0.05 full model
+    ## 2  868.7597 Wide data with some signal, threshold p=0.05 reduced model
 
 ### Data with no signal
 
@@ -168,16 +184,16 @@ run_vs_example(ngood=0, nnoise=nnoise,
 ![](PermutationSelection_files/figure-markdown_github/varSelnosig-1.png)![](PermutationSelection_files/figure-markdown_github/varSelnosig-2.png)
 
     ## [1] "Selected variables (permutation):"
-    ## [1] "n_39" "n_58" "n_75" "n_94"
+    ## [1] "n_2"  "n_17" "n_22"
     ## [1] "Selected variables (chi-squared):"
-    ## [1] "n_39" "n_58" "n_75" "n_94"
+    ## [1] "n_2"  "n_17" "n_22" "n_91"
     ## [1] " ========= Compare full and reduced models (holdout performance) =========="
 
 ![](PermutationSelection_files/figure-markdown_github/varSelnosig-3.png)![](PermutationSelection_files/figure-markdown_github/varSelnosig-4.png)
 
     ##   deviance                                               label
-    ## 1 1507.437    Data with no signal, threshold p=0.05 full model
-    ## 2 1421.753 Data with no signal, threshold p=0.05 reduced model
+    ## 1 1580.967    Data with no signal, threshold p=0.05 full model
+    ## 2 1413.463 Data with no signal, threshold p=0.05 reduced model
 
 ### Bad Bayes
 
@@ -199,13 +215,13 @@ run_vs_example(ngood=0, nnoise=nnoise,
 ![](PermutationSelection_files/figure-markdown_github/varSelnosig2-1.png)![](PermutationSelection_files/figure-markdown_github/varSelnosig2-2.png)
 
     ## [1] "Selected variables (permutation):"
-    ## [1] "n_54"  "n_65"  "n_99"  "n_199"
+    ## [1] "n_112" "n_220" "n_221"
     ## [1] "Selected variables (chi-squared):"
-    ## [1] "n_54" "n_65"
+    ## [1] "n_112" "n_190" "n_220" "n_221"
     ## [1] " ========= Compare full and reduced models (holdout performance) =========="
 
 ![](PermutationSelection_files/figure-markdown_github/varSelnosig2-3.png)![](PermutationSelection_files/figure-markdown_github/varSelnosig2-4.png)
 
     ##   deviance                                               label
-    ## 1 2257.270    Bad Bayes situation, threshold p=0.01 full model
-    ## 2 1429.987 Bad Bayes situation, threshold p=0.01 reduced model
+    ## 1 2112.860    Bad Bayes situation, threshold p=0.01 full model
+    ## 2 1431.091 Bad Bayes situation, threshold p=0.01 reduced model

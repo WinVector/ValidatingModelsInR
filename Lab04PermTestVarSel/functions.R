@@ -164,7 +164,7 @@ run_example = function(ngood, nnoise, datasize, nperm, title='') {
   dTest = mkData(datasize, coefs, nnoise)
   testpred = predict(model, newdata=dTest, type="response")
   testperf = performance_eval(testpred,
-                              dTest$y, "pos", title=paste(title, "Test"), verbose=FALSE)
+                              dTest$y, "pos", title=paste(title, "Test"))
 
 
   print(paste("Compare training and test performance estimates,", title))
@@ -184,7 +184,7 @@ run_example = function(ngood, nnoise, datasize, nperm, title='') {
   nullframe = data.frame(deviance=nullperf)
   ggplot(nullframe, aes(x=deviance)) + geom_density() +
     geom_vline(xintercept=trainperf$deviance, color="red") +
-    ggtitle(paste(title, ": deviance"))
+    ggtitle(paste(title, ": permuted training deviance"))
 
 }
 

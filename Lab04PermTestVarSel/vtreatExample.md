@@ -11,10 +11,6 @@ library('randomForest')
     ## 
     ## Attaching package: 'randomForest'
 
-    ## The following object is masked from 'package:gridExtra':
-    ## 
-    ##     combine
-
     ## The following object is masked from 'package:ggplot2':
     ## 
     ##     margin
@@ -24,8 +20,34 @@ source("functions.R")
 # install.packages("devtools")
 # devtools::install_github("WinVector/WVPlots",build_vignettes=TRUE)
 library("WVPlots")
+```
 
+    ## Loading required package: grid
 
+    ## Loading required package: gridExtra
+
+    ## 
+    ## Attaching package: 'gridExtra'
+
+    ## The following object is masked from 'package:randomForest':
+    ## 
+    ##     combine
+
+    ## Loading required package: reshape2
+
+    ## Loading required package: plyr
+
+    ## Loading required package: stringr
+
+    ## Loading required package: mgcv
+
+    ## Loading required package: nlme
+
+    ## This is mgcv 1.8-14. For overview type 'help("mgcv-package")'.
+
+    ## Loading required package: sigr
+
+``` r
 set.seed(12959437)
 coefs = mkCoefs(20)
 nnoise = 2000
@@ -53,10 +75,6 @@ if(!require('dplyr')) {
     ## 
     ## Attaching package: 'dplyr'
 
-    ## The following object is masked from 'package:randomForest':
-    ## 
-    ##     combine
-
     ## The following object is masked from 'package:nlme':
     ## 
     ##     collapse
@@ -67,6 +85,10 @@ if(!require('dplyr')) {
     ##     summarize
 
     ## The following object is masked from 'package:gridExtra':
+    ## 
+    ##     combine
+
+    ## The following object is masked from 'package:randomForest':
     ## 
     ##     combine
 
