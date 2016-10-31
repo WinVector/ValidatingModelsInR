@@ -10,6 +10,7 @@ output:
 Data from [Table 7. Height in centimeters for children and adolescents aged 2–19 years and number of examined persons, mean, standard error of the mean, and selected percentiles, by sex and age: United States, 2007–2010](http://www.cdc.gov/nchs/data/series/sr_11/sr11_252.pdf).
 
 ```{r}
+library("ggplot2")
 h <- data.frame(sex=c('Male','Female'),
                 n=c(179,118),
                 mean=c(177.8,163.4),
@@ -60,6 +61,29 @@ for(a in popFemale) {
 print(sqrt(sumFemale/nFemale))
 print(sd(popFemale)*sqrt(2))
 print(sqrt(sumCross/nCross)/sqrt(sumFemale/nFemale))
+
+dpop <- rbind(data.frame(heightCM=popMale,sex='Male'),
+              data.frame(heightCM=popFemale,sex="Female"))
+
+h$sdOfINdividuals <- h$seOfMean*sqrt(h$n)
+
+densM  = density(dpop$heightCM[dpop$sex=='Male'], adjust=0.5)
+densF  = density(dpop$heightCM[dpop$sex=='Female'], adjust=0.5)
+dens <- rbind(data.frame(heightCM=densM$x,density=densM$y,sex='Male'),
+              data.frame(heightCM=densF$x,density=densF$y,sex='Female'))
+dens$inBar <- ((dens$sex=='Female')&((dens$heightCM>=h[2,'mean']-h[2,'sdOfINdividuals'])&
+  (dens$heightCM<=h[2,'mean']+h[2,'sdOfINdividuals']))) | 
+   ((dens$sex=='Male')&((dens$heightCM>=h[1,'mean']-h[1,'sdOfINdividuals'])&
+  (dens$heightCM<=h[1,'mean']+h[1,'sdOfINdividuals'])))
+ggplot() +
+  geom_line(data=dens,mapping=aes(x=heightCM,y=density,color=sex)) +
+  geom_ribbon(data=dens[dens$inBar,,drop=FALSE],
+              mapping=aes(x=heightCM,ymin=0,ymax=density,fill=sex),alpha=0.4) +
+  geom_vline(data=h,mapping=aes(xintercept=mean,color=sex)) +
+  geom_errorbarh(data=h,
+                 mapping=aes(y=0.025,x=mean,xmin=mean-seOfMean,xmax=mean+seOfMean,color=sex),
+                 height=0.025) + 
+  facet_wrap(~sex,ncol=1)
 ```
 
 Data from [English men's and women's heights](https://en.wikipedia.org/wiki/Effect_size#Cohen.27s_d) in mm.
