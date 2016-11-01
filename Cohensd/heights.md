@@ -7,30 +7,32 @@ h <- data.frame(sex=c('Male','Female'),
                 mean=c(177.8,163.4),
                 seOfMean=c(0.81,0.72),
                 stringsAsFactors = FALSE)
+h$sdOfIndividuals <- sqrt(h$n)*h$seOfMean
 print(h)
 ```
 
-    ##      sex   n  mean seOfMean
-    ## 1   Male 179 177.8     0.81
-    ## 2 Female 118 163.4     0.72
+    ##      sex   n  mean seOfMean sdOfIndividuals
+    ## 1   Male 179 177.8     0.81       10.837061
+    ## 2 Female 118 163.4     0.72        7.821202
 
 ``` r
-pooledSE <- (h[1,'n']*h[1,'seOfMean']+h[2,'n']*h[2,'seOfMean'])/(h[1,'n']+h[2,'n'])
-z <- (h[1,'mean']-h[2,'mean'])/pooledSE
+pooledSD <- ((h[1,'n']-1)*h[1,'sdOfIndividuals']+(h[2,'n']-1)*h[2,'sdOfIndividuals'])/
+  (h[1,'n']+h[2,'n']-2)
+z <- (h[1,'mean']-h[2,'mean'])/(pooledSD/sqrt(h[1,'n']+h[2,'n']))
 print(z)
 ```
 
-    ## [1] 18.59883
+    ## [1] 25.74076
 
 ``` r
-d <- z/sqrt(h[1,'n']+h[2,'n'])
+d <- (h[1,'mean']-h[2,'mean'])/pooledSD
 print(d)
 ```
 
-    ## [1] 1.079213
+    ## [1] 1.49363
 
 ``` r
-# simulate
+# simulate 
 set.seed(23525)
 popMale <- rnorm(n=h[1,'n'],mean = h[1,'mean'], sd = sqrt(h[1,'n'])*h[1,'seOfMean'])
 popFemale <- rnorm(n=h[2,'n'],mean = h[2,'mean'], sd = sqrt(h[2,'n'])*h[2,'seOfMean'])
@@ -101,6 +103,43 @@ print(sqrt(sumCross/nCross)/sqrt(sumFemale/nFemale))
     ## [1] 1.873472
 
 ``` r
+rat <- (sumCross/nCross)/((sumMale+sumFemale)/(nMale+nFemale))
+print(rat)
+```
+
+    ## [1] 2.089408
+
+``` r
+print(1+d*d/2)
+```
+
+    ## [1] 2.115466
+
+``` r
+print(sqrt(rat))
+```
+
+    ## [1] 1.445478
+
+``` r
+print(sqrt(d*d/2+1))
+```
+
+    ## [1] 1.454464
+
+``` r
+print(sqrt(rat-1))
+```
+
+    ## [1] 1.043747
+
+``` r
+print(d/sqrt(2))
+```
+
+    ## [1] 1.056156
+
+``` r
 dpop <- rbind(data.frame(heightCM=popMale,sex='Male'),
               data.frame(heightCM=popFemale,sex="Female"))
 
@@ -143,16 +182,17 @@ print(h)
     ## 2 Female 3311 1612           69.05
 
 ``` r
-pooledSD <- (h[1,'n']*h[1,'sdOfIndividuals']+h[2,'n']*h[2,'sdOfIndividuals'])/(h[1,'n']+h[2,'n'])
-t <- (h[1,'mean']-h[2,'mean'])/(pooledSD/sqrt(h[1,'n']+h[2,'n']))
-print(t)
+pooledSD <- ((h[1,'n']-1)*h[1,'sdOfIndividuals']+(h[2,'n']-1)*h[2,'sdOfIndividuals'])/
+  (h[1,'n']+h[2,'n']-2)
+z <- (h[1,'mean']-h[2,'mean'])/(pooledSD/sqrt(h[1,'n']+h[2,'n']))
+print(z)
 ```
 
-    ## [1] 134.2949
+    ## [1] 134.2959
 
 ``` r
 d <- (h[1,'mean']-h[2,'mean'])/pooledSD
 print(d)
 ```
 
-    ## [1] 1.771491
+    ## [1] 1.771504
