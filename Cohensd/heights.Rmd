@@ -7,7 +7,9 @@ output:
     variant: markdown_github
 ---
 
-Data from [Table 7. Height in centimeters for children and adolescents aged 2–19 years and number of examined persons, mean, standard error of the mean, and selected percentiles, by sex and age: United States, 2007–2010](http://www.cdc.gov/nchs/data/series/sr_11/sr11_252.pdf).
+
+    
+Data: 19 year olds from [Table 7. Height in centimeters for children and adolescents aged 2–19 years and number of examined persons, mean, standard error of the mean, and selected percentiles, by sex and age: United States, 2007–2010](http://www.cdc.gov/nchs/data/series/sr_11/sr11_252.pdf).
 
 ```{r}
 library("ggplot2")
@@ -18,6 +20,7 @@ h <- data.frame(sex=c('Male','Female'),
                 stringsAsFactors = FALSE)
 h$sdOfIndividuals <- sqrt(h$n)*h$seOfMean
 print(h)
+
 pooledSD <- ((h[1,'n']-1)*h[1,'sdOfIndividuals']+(h[2,'n']-1)*h[2,'sdOfIndividuals'])/
   (h[1,'n']+h[2,'n']-2)
 z <- (h[1,'mean']-h[2,'mean'])/(pooledSD/sqrt(h[1,'n']+h[2,'n']))
@@ -28,7 +31,41 @@ print(d)
 # simulate 
 set.seed(23525)
 popMale <- rnorm(n=h[1,'n'],mean = h[1,'mean'], sd = sqrt(h[1,'n'])*h[1,'seOfMean'])
+popMale <- popMale*h$sdOfIndividuals[[1]]/sd(popMale)
+popMale <- popMale + h$mean[[1]] - mean(popMale)
 popFemale <- rnorm(n=h[2,'n'],mean = h[2,'mean'], sd = sqrt(h[2,'n'])*h[2,'seOfMean'])
+popFemale <- popFemale*h$sdOfIndividuals[[2]]/sd(popFemale)
+popFemale <- popFemale + h$mean[[2]] - mean(popFemale)
+
+computeD <- function(pop1,pop2) {
+  sd1 <- sd(pop1)
+  sd2 <- sd(pop2)
+  pooledSD <- ((length(pop1)-1)*sd1+(length(pop2)-1)*sd2)/(length(pop1)+length(pop2)-2)
+  d <- (mean(pop1)-mean(pop2))/pooledSD
+  d
+}
+
+computeD(popMale,popFemale)
+
+drawR1 <- function() {
+  pM <- sample(popMale,size=length(popMale),replace=TRUE)
+  pF <- sample(popFemale,size=length(popFemale),replace=TRUE)
+  computeD(pM,pF)
+}
+
+drawRPooled <- function() {
+  pM <- sample(c(popMale,popFemale),size=length(popMale),replace=TRUE)
+  pF <- sample(c(popMale,popFemale),size=length(popFemale),replace=TRUE)
+  computeD(pM,pF)
+}
+
+dDraws <- rbind(data.frame(d=replicate(1000,drawR1()),resample='redraw'),
+                data.frame(d=replicate(1000,drawRPooled()),resample='pooled'))
+ggplot(data=dDraws,mapping=aes(x=d,color=resample)) + 
+  geom_density(adjust=0.5) + geom_vline(xintercept = d) +
+  ggtitle("resampled d estimates")
+
+
 
 sumCross <- 0
 nCross <- 0

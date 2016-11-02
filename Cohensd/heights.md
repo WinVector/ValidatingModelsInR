@@ -1,4 +1,4 @@
-Data from [Table 7. Height in centimeters for children and adolescents aged 2–19 years and number of examined persons, mean, standard error of the mean, and selected percentiles, by sex and age: United States, 2007–2010](http://www.cdc.gov/nchs/data/series/sr_11/sr11_252.pdf).
+Data: 19 year olds from [Table 7. Height in centimeters for children and adolescents aged 2–19 years and number of examined persons, mean, standard error of the mean, and selected percentiles, by sex and age: United States, 2007–2010](http://www.cdc.gov/nchs/data/series/sr_11/sr11_252.pdf).
 
 ``` r
 library("ggplot2")
@@ -35,8 +35,48 @@ print(d)
 # simulate 
 set.seed(23525)
 popMale <- rnorm(n=h[1,'n'],mean = h[1,'mean'], sd = sqrt(h[1,'n'])*h[1,'seOfMean'])
+popMale <- popMale*h$sdOfIndividuals[[1]]/sd(popMale)
+popMale <- popMale + h$mean[[1]] - mean(popMale)
 popFemale <- rnorm(n=h[2,'n'],mean = h[2,'mean'], sd = sqrt(h[2,'n'])*h[2,'seOfMean'])
+popFemale <- popFemale*h$sdOfIndividuals[[2]]/sd(popFemale)
+popFemale <- popFemale + h$mean[[2]] - mean(popFemale)
 
+computeD <- function(pop1,pop2) {
+  sd1 <- sd(pop1)
+  sd2 <- sd(pop2)
+  pooledSD <- ((length(pop1)-1)*sd1+(length(pop2)-1)*sd2)/(length(pop1)+length(pop2)-2)
+  d <- (mean(pop1)-mean(pop2))/pooledSD
+  d
+}
+
+computeD(popMale,popFemale)
+```
+
+    ## [1] 1.49363
+
+``` r
+drawR1 <- function() {
+  pM <- sample(popMale,size=length(popMale),replace=TRUE)
+  pF <- sample(popFemale,size=length(popFemale),replace=TRUE)
+  computeD(pM,pF)
+}
+
+drawRPooled <- function() {
+  pM <- sample(c(popMale,popFemale),size=length(popMale),replace=TRUE)
+  pF <- sample(c(popMale,popFemale),size=length(popFemale),replace=TRUE)
+  computeD(pM,pF)
+}
+
+dDraws <- rbind(data.frame(d=replicate(1000,drawR1()),resample='redraw'),
+                data.frame(d=replicate(1000,drawRPooled()),resample='pooled'))
+ggplot(data=dDraws,mapping=aes(x=d,color=resample)) + 
+  geom_density(adjust=0.5) + geom_vline(xintercept = d) +
+  ggtitle("resampled d estimates")
+```
+
+![](heights_files/figure-markdown_github/unnamed-chunk-1-1.png)
+
+``` r
 sumCross <- 0
 nCross <- 0
 for(a in popMale) {
@@ -48,7 +88,7 @@ for(a in popMale) {
 print(sqrt(sumCross/nCross))
 ```
 
-    ## [1] 21.65585
+    ## [1] 19.61628
 
 ``` r
 sumMale <- 0
@@ -62,19 +102,19 @@ for(a in popMale) {
 print(sqrt(sumMale/nMale))
 ```
 
-    ## [1] 16.24591
+    ## [1] 15.28305
 
 ``` r
 print(sd(popMale)*sqrt(2))
 ```
 
-    ## [1] 16.29148
+    ## [1] 15.32592
 
 ``` r
 print(sqrt(sumCross/nCross)/sqrt(sumMale/nMale))
 ```
 
-    ## [1] 1.333003
+    ## [1] 1.283532
 
 ``` r
 sumFemale <- 0
@@ -88,26 +128,26 @@ for(a in popFemale) {
 print(sqrt(sumFemale/nFemale))
 ```
 
-    ## [1] 11.5592
+    ## [1] 11.01388
 
 ``` r
 print(sd(popFemale)*sqrt(2))
 ```
 
-    ## [1] 11.60849
+    ## [1] 11.06085
 
 ``` r
 print(sqrt(sumCross/nCross)/sqrt(sumFemale/nFemale))
 ```
 
-    ## [1] 1.873472
+    ## [1] 1.781051
 
 ``` r
 rat <- (sumCross/nCross)/((sumMale+sumFemale)/(nMale+nFemale))
 print(rat)
 ```
 
-    ## [1] 2.089408
+    ## [1] 1.928203
 
 ``` r
 print(1+d*d/2)
@@ -119,7 +159,7 @@ print(1+d*d/2)
 print(sqrt(rat))
 ```
 
-    ## [1] 1.445478
+    ## [1] 1.388598
 
 ``` r
 print(sqrt(d*d/2+1))
@@ -131,7 +171,7 @@ print(sqrt(d*d/2+1))
 print(sqrt(rat-1))
 ```
 
-    ## [1] 1.043747
+    ## [1] 0.9634331
 
 ``` r
 print(d/sqrt(2))
@@ -164,7 +204,7 @@ ggplot() +
   facet_wrap(~sex,ncol=1)
 ```
 
-![](heights_files/figure-markdown_github/unnamed-chunk-1-1.png)
+![](heights_files/figure-markdown_github/unnamed-chunk-1-2.png)
 
 Data from [English men's and women's heights](https://en.wikipedia.org/wiki/Effect_size#Cohen.27s_d) in mm.
 
